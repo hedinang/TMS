@@ -1,6 +1,8 @@
-export function action(text) {
+export function action(type, value) {
     return {
-        type: 'CHANGE',
-        text
+        type: type,
+        value: value
     };
 }
+
+

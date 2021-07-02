@@ -1,78 +1,61 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 import './App.scss';
 import AppRoutes from './AppRoutes';
 import Navbar from './components/shared/Navbar';
 import Sidebar from './components/shared/Sidebar';
 import Footer from './components/shared/Footer';
-import { withTranslation } from "react-i18next";
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEye } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faEye)
+import { connect } from 'react-redux'
 
 class App extends Component {
-  state = {}
-  componentDidMount() {
-    this.onRouteChanged();
+
+  componentWillMount() {
+    let path = 'Trang chủ'
+    switch (window.location.pathname) {
+      case '/bookings':
+        path = 'Đặt chuyến'
+        break;
+      case '/method/vehicle':
+        path = 'Phương tiện'
+        break;
+      case '/method/vehicle':
+        path = 'Phương tiện'
+        break;
+      case '/store':
+        path = 'Quản lý kho'
+        break;
+      default:
+        break;
+    }
+    this.state = {
+      navBar: path
+    }
   }
   render() {
-    let navbarComponent = !this.state.isFullPageLayout ? <Navbar /> : '';
-    let sidebarComponent = !this.state.isFullPageLayout ? <Sidebar /> : '';
-    let footerComponent = !this.state.isFullPageLayout ? <Footer /> : '';
+
     return (
       <div className="container-scroller">
-        { sidebarComponent}
+        <Sidebar click={() => {
+          this.setState({
+            navBar: this.props.state.navBar
+          })
+        }} />
         <div className="container-fluid page-body-wrapper">
-          {navbarComponent}
+          <Navbar navBar={this.state.navBar} />
           <div className="main-panel">
             <div className="content-wrapper">
               <AppRoutes />
             </div>
-            {footerComponent}
+            <Footer />
           </div>
         </div>
       </div>
     );
   }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.location !== prevProps.location) {
-      this.onRouteChanged();
-    }
+}
+function select(state) {
+  return {
+    state: state.reducer
   }
-
-  onRouteChanged() {
-    console.log("ROUTE CHANGED");
-    const { i18n } = this.props;
-    const body = document.querySelector('body');
-    if (this.props.location.pathname === '/layout/RtlLayout') {
-      body.classList.add('rtl');
-      i18n.changeLanguage('ar');
-    }
-    else {
-      body.classList.remove('rtl')
-      i18n.changeLanguage('en');
-    }
-    window.scrollTo(0, 0);
-    const fullPageLayoutRoutes = ['/user-pages/login-1', '/user-pages/login-2', '/user-pages/register-1', '/user-pages/register-2', '/user-pages/lockscreen', '/error-pages/error-404', '/error-pages/error-500', '/general-pages/landing-page'];
-    for (let i = 0; i < fullPageLayoutRoutes.length; i++) {
-      if (this.props.location.pathname === fullPageLayoutRoutes[i]) {
-        this.setState({
-          isFullPageLayout: true
-        })
-        document.querySelector('.page-body-wrapper').classList.add('full-page-wrapper');
-        break;
-      } else {
-        this.setState({
-          isFullPageLayout: false
-        })
-        document.querySelector('.page-body-wrapper').classList.remove('full-page-wrapper');
-      }
-    }
-  }
-
 }
 
-export default withTranslation()(withRouter(App));
+export default (connect(select)(App));

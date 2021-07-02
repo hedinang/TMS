@@ -1,10 +1,10 @@
-import React, { Component,Suspense, lazy } from 'react';
+import React, { Component, Suspense, lazy } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import Spinner from './components/shared/Spinner';
 
-const Dashboard = lazy(() => import('./components/pages/Dashboard'));
-
+const Dashboard = lazy(() => import('./components/pages/DashBoard'));
+const Bookings = lazy(() => import('./components/pages/Bookings'));
 const Buttons = lazy(() => import('./components/basic-ui/Buttons'));
 const Dropdowns = lazy(() => import('./components/basic-ui/Dropdowns'));
 const Typography = lazy(() => import('./components/basic-ui/Typography'));
@@ -25,32 +25,23 @@ const Register1 = lazy(() => import('./components/user-pages/Register'));
 
 
 class AppRoutes extends Component {
-  render () {
+  render() {
     return (
-      <Suspense fallback={<Spinner/>}>
+      <Suspense fallback={<Spinner />}>
         <Switch>
-          <Route exact path="/dashboard" component={ Dashboard } />
-
-          <Route path="/basic-ui/buttons" component={ Buttons } />
-          <Route path="/basic-ui/dropdowns" component={ Dropdowns } />
-          <Route path="/basic-ui/typography" component={ Typography } />
-
-          <Route path="/form-Elements/basic-elements" component={ BasicElements } />
-
-          <Route path="/tables/basic-table" component={ BasicTable } />
-
-          <Route path="/icons/mdi" component={ Mdi } />
-
-          <Route path="/charts/chart-js" component={ ChartJs } />
-
-
-          <Route path="/user-pages/login-1" component={ Login } />
-          <Route path="/user-pages/register-1" component={ Register1 } />
-
-          <Route path="/error-pages/error-404" component={ Error404 } />
-          <Route path="/error-pages/error-500" component={ Error500 } />
-
-
+          <Route exact path="/dashboard" component={Dashboard} />
+          <Route path="/bookings" component={Bookings} />
+          <Route path="/method/vehicle" component={Buttons} />
+          <Route path="/method/device" component={Dropdowns} />
+          <Route path="/store" component={Typography} />
+          <Route path="/form-Elements/basic-elements" component={BasicElements} />
+          <Route path="/tables/basic-table" component={BasicTable} />
+          <Route path="/icons/mdi" component={Mdi} />
+          <Route path="/charts/chart-js" component={ChartJs} />
+          <Route path="/user-pages/login-1" component={Login} />
+          <Route path="/user-pages/register-1" component={Register1} />
+          <Route path="/error-pages/error-404" component={Error404} />
+          <Route path="/error-pages/error-500" component={Error500} />
           <Redirect to="/dashboard" />
         </Switch>
       </Suspense>

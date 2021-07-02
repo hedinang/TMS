@@ -3,6 +3,7 @@ import { Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { BsToggleOn } from 'react-icons/bs'
+import { connect } from 'react-redux'
 
 class Navbar extends Component {
   toggleOffcanvas() {
@@ -11,15 +12,18 @@ class Navbar extends Component {
   toggleRightSidebar() {
     document.querySelector('.right-sidebar').classList.toggle('open');
   }
+  // state = {
+  //   navBar: this.props.state.navBar
+  // }
   render() {
     return (
-      <nav className="navbar p-0 fixed-top d-flex flex-row">
+      <nav className={"p-0 fixed-top d-flex flex-row " + "navbar"}>
         <div className="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
           <Link className="navbar-brand brand-logo-mini" to="/"><img src={require('../../../assets/images/logo-mini.svg')} alt="logo" /></Link>
         </div>
         <div className="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
           <ul className="navbar-nav w-100">
-            <li className="nav-item w-25" style={{ textAlign: "center" }}>Trang chủ</li>
+            <li className="nav-item w-25" style={{ textAlign: "center" }}>{this.props.navBar}</li>
             <li className="nav-item w-75">
               <form className="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
                 <input type="text" className="form-control" placeholder="Tìm kiếm" />
@@ -68,9 +72,11 @@ class Navbar extends Component {
               </Dropdown.Menu>
             </Dropdown>
             <li className="nav-item d-none d-lg-block">
-              <a className="nav-link" href="!#" onClick={event => event.preventDefault()}>
+              <a className="nav-link" onClick={event => {
+                event.preventDefault()
+
+              }}>
                 <BsToggleOn />
-                {/* <i className="mdi mdi-view-grid"></i> */}
               </a>
             </li>
             <Dropdown alignRight as="li" className="nav-item border-left" >
@@ -219,5 +225,9 @@ class Navbar extends Component {
     );
   }
 }
-
-export default Navbar;
+function select(state) {
+  return {
+    state: state.reducer
+  }
+}
+export default connect(select)(Navbar);
