@@ -10,12 +10,31 @@ import {
     TableColumnReordering, TableColumnVisibility, TableFixedColumns, Grid, GroupingPanel,
     PagingPanel, Table, TableFilterRow, TableHeaderRow, Toolbar,
 } from '@devexpress/dx-react-grid-material-ui';
-import { faTrashAlt, faPencilAlt, faEye } from '@fortawesome/fontawesome-free-solid'
+import { faTrashAlt, faPencilAlt } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { Component } from 'react';
-class Monitor extends Component {
+class Detail extends Component {
+
     state = {
-        reload: ''
+        data: [
+            {
+                id: 'STT',
+                customerId: 'customerId',
+                customerName: 'customerName',
+                address: 'address',
+                receiveName: 'receiveName',
+                status: 'status',
+                pod: 'pod',
+                cod: 'cod',
+                image: 'image',
+                seal: 'seal',
+                cargo: 'cargo',
+                eta: 'eta',
+                ata: 'ata'
+            }
+        ],
+        reload: 0
+
     }
     ActionFormatter = (value) => {
         return (
@@ -26,48 +45,39 @@ class Monitor extends Component {
                 <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPencilAlt} />
                 </button>
-                <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
-                    <FontAwesomeIcon icon={faEye} />
-                </button>
                 {/* <Button style={{ background: 'blue', color: 'white' }}>Xửa</Button>
                 <Button style={{ background: 'blue', color: 'white' }}>Xóa</Button> */}
             </div>
         )
     }
-    WarningFormatter = (value) => {
+    StatusFormater = (value) => {
         switch (value.value) {
             case 0:
                 return <span style={{
                     padding: '.5em .75em',
-                    textAlign: 'center', background: '#fc424a',
+                    textAlign: 'center', background: '#feac08',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Nhiệt độ</span>
-            case 1:
+                }}>Đang giao</span>
+            default:
                 return <span style={{
                     padding: '.5em .75em',
                     textAlign: 'center', background: '#0abb87',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Bình thường</span>
-            default:
-                return <span style={{
-                    padding: '.5em .75em',
-                    textAlign: 'center', background: '#ffab02',
-                    borderRadius: '0.25rem', color: 'white',
-                }}>Cửa mở</span>
+                }}>Đã giao</span>
 
 
         }
     }
-    ActionTypeProvider = props => (
+    StatusTypeProvider = props => (
         <DataTypeProvider
-            formatterComponent={this.ActionFormatter}
+            formatterComponent={this.StatusFormater}
             {...props}
         />
     );
 
-    WarningTypeProvider = props => (
+    ActionTypeProvider = props => (
         <DataTypeProvider
-            formatterComponent={this.WarningFormatter}
+            formatterComponent={this.ActionFormatter}
             {...props}
         />
     )
@@ -75,10 +85,10 @@ class Monitor extends Component {
     // let setColumnOrder = ['product', 'region', 'amount', 'saleDate', 'customer', 'channel', 'abc', 'xyz', 'a', 'warning', 'sector', 'action']
     // const defaultHiddenColumnNames = []
     render() {
-        let selectedMonitor = []
-        this.props.state.selectedMonitor.forEach(e => {
+        let selectedDetail = []
+        this.props.state.selectedDetail.forEach(e => {
             if (e.checked === true)
-                selectedMonitor.push(
+                selectedDetail.push(
                     {
                         name: e.field,
                         title: e.title
@@ -86,93 +96,37 @@ class Monitor extends Component {
                 )
         })
         let data = [
-            {
-                id: 1111112,
-                // date: new Date(),
-                tripId: '22FF',
-                tripName: 'Chuyến 2345',
-                licensePlace: '1234ABC',
-                vehicleType: 'Xe container',
-                weight: 1000,
-                cargo: 500,
-                temperature: '10 đến 20',
-                point: 'Ba Đình -> Cầu Giấy -> Mỹ Đình',
-                driver: 'Nguyễn Văn A',
-                state: 1,
-                location: '506 Vĩnh Phúc, Ba Đình, Hà Nội',
-                warning: 1
-            },
-            {
-                id: 1111111,
-                // date: new Date(),
-                tripId: '1AAA',
-                tripName: 'Chuyến 123',
-                licensePlace: '1234ABC',
-                vehicleType: 'Xe tải to',
-                weight: 1000,
-                cargo: 500,
-                temperature: '10 đến 20',
-                point: 'Ba Đình -> Cầu Giấy -> Mỹ Đình',
-                driver: 'Nguyễn Văn A',
-                state: 0,
-                location: '506 Vĩnh Phúc, Ba Đình, Hà Nội',
-                warning: 0
-            },
-            {
-                id: 1111112,
-                // date: new Date(),
-                tripId: '22FF',
-                tripName: 'Chuyến 2345',
-                licensePlace: '1234ABC',
-                vehicleType: 'Xe container',
-                weight: 1000,
-                cargo: 500,
-                temperature: '10 đến 20',
-                point: 'Ba Đình -> Cầu Giấy -> Mỹ Đình',
-                driver: 'Nguyễn Văn A',
-                state: 1,
-                location: '506 Vĩnh Phúc, Ba Đình, Hà Nội',
-                warning: 1
-            },
-            {
-                id: 1111111,
-                // date: new Date(),
-                tripId: '1AAA',
-                tripName: 'Chuyến 123',
-                licensePlace: '1234ABC',
-                vehicleType: 'Xe tải to',
-                weight: 1000,
-                cargo: 500,
-                temperature: '10 đến 20',
-                point: 'Ba Đình -> Cầu Giấy -> Mỹ Đình',
-                driver: 'Nguyễn Văn A',
-                state: 0,
-                location: '506 Vĩnh Phúc, Ba Đình, Hà Nội',
-                warning: 2
-            },
-            {
-                id: 1111112,
-                // date: new Date(),
-                tripId: '22FF',
-                tripName: 'Chuyến 2345',
-                licensePlace: '1234ABC',
-                vehicleType: 'Xe container',
-                weight: 1000,
-                cargo: 500,
-                temperature: '10 đến 20',
-                point: 'Ba Đình -> Cầu Giấy -> Mỹ Đình',
-                driver: 'Nguyễn Văn A',
-                state: 1,
-                location: '506 Vĩnh Phúc, Ba Đình, Hà Nội',
-                warning: 1
-            }
+            //     {
+            //     id: 1111111,
+            //     action: '11',
+            //     bookingCode: '22',
+            //     shipperName: '33',
+            //     contactNumber: '44',
+            //     city: '55',
+            //     vehicleType: '66',
+            //     vehicleNumber: '77',
+            //     insurance: '88',
+            //     status: 0,
+            // },
+            // {
+            //     id: 1111112,
+            //     action: '11',
+            //     bookingCode: '22',
+            //     shipperName: '33',
+            //     contactNumber: '44',
+            //     city: '55',
+            //     vehicleType: '66',
+            //     vehicleNumber: '77',
+            //     insurance: '88',
+            //     status: 1,
+            // }
         ]
-        let leftColumns = ['id', 'action', 'date', 'tripId']
+        let leftColumns = ['id', 'customerId', 'customerName', 'address']
         // let leftColumns = ['action', 'bookingCode', 'shipperName']
-        let rightColumns = ['location', 'warning']
+        // let rightColumns = ['status']
         let tableColumnExtensions = [
-            { columnName: 'id', width: 180 },
-            { columnName: 'action', width: 180 },
+            // { columnName: 'id', width: 180 },
+            // { columnName: 'action', width: 180 },
             // { columnName: 'bookingCode', width: 200 },
             // { columnName: 'shipperName', width: 180 },
             // { columnName: 'contactNumber', width: 230 },
@@ -180,10 +134,10 @@ class Monitor extends Component {
             // { columnName: 'status', width: 170 },
         ];
         let actionColumns = ['action']
-        let warningColumns = ['warning']
+        let statusColumns = ['status']
         let filteringStateColumnExtensions = [
             { columnName: 'action', filteringEnabled: false },
-            { columnName: 'warning', filteringEnabled: false },
+            { columnName: 'status', filteringEnabled: false },
         ]
         let currentPage = 0
         let setCurrentPage = 0
@@ -194,20 +148,20 @@ class Monitor extends Component {
 
             <Paper >
                 <Grid
-                xs={6}
+                xs={12}
                     rows={data}
-                    columns={selectedMonitor}
+                    columns={selectedDetail}
                 >
                     {/* <SortingState
                         defaultSorting={[{ columnName: 'saleDate', direction: 'asc' }]}
                     /> */}
                     {/* <IntegratedSorting /> */}
-                    <this.ActionTypeProvider
+                    {/* <this.ActionTypeProvider
                         for={actionColumns}
                     />
-                    <this.WarningTypeProvider
-                        for={warningColumns}
-                    />
+                    <this.StatusTypeProvider
+                        for={statusColumns}
+                    /> */}
                     <FilteringState
                         // defaultFilters={defaultFilters}
                         columnExtensions={filteringStateColumnExtensions}
@@ -227,7 +181,7 @@ class Monitor extends Component {
                     <TableFilterRow />
                     <TableFixedColumns
                         leftColumns={leftColumns}
-                        rightColumns={rightColumns}
+                    // rightColumns={rightColumns}
                     />
                     <PagingState
                         currentPage={currentPage}
@@ -238,12 +192,11 @@ class Monitor extends Component {
                     <IntegratedPaging />
                     <TableColumnVisibility
 
+
                     // defaultHiddenColumnNames={defaultHiddenColumnNames}
                     />
                     <Toolbar />
-                    <ToolbarPanel panel={this.props.panel} reload={() => {
-                        this.props.reload()
-                    }} />
+                    <ToolbarPanel panel={this.props.panel} />
                     {/* <PagingPanel
                         pageSizes={pageSizes}
                     /> */}
@@ -258,7 +211,7 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(Monitor);
+export default connect(select)(Detail);
 
 
 

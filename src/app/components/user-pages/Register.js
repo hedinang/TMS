@@ -1,62 +1,99 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
-export class Register extends Component {
-  render() {
-    return (
-      <div>
-        <div className="d-flex align-items-center auth px-0 h-100">
-          <div className="row w-100 mx-0">
-            <div className="col-lg-4 mx-auto">
-              <div className="card text-left py-5 px-4 px-sm-5">
-                <div className="brand-logo">
-                  <img src={require("../../../assets/images/logo.svg")} alt="logo" />
-                </div>
-                <h4>New here?</h4>
-                <h6 className="font-weight-light">Signing up is easy. It only takes a few steps</h6>
-                <form className="pt-3">
-                  <div className="form-group">
-                    <input type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Username" />
-                  </div>
-                  <div className="form-group">
-                    <input type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" />
-                  </div>
-                  <div className="form-group">
-                    <select className="form-control form-control-lg" id="exampleFormControlSelect2">
-                      <option>Country</option>
-                      <option>United States of America</option>
-                      <option>United Kingdom</option>
-                      <option>India</option>
-                      <option>Germany</option>
-                      <option>Argentina</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <input type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" />
-                  </div>
-                  <div className="mb-4">
-                    <div className="form-check">
-                      <label className="form-check-label text-muted">
-                        <input type="checkbox" className="form-check-input" />
-                        <i className="input-helper"></i>
-                        I agree to all Terms & Conditions
-                      </label>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <Link className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" to="/dashboard">SIGN UP</Link>
-                  </div>
-                  <div className="text-center mt-4 font-weight-light">
-                    Already have an account? <Link to="/user-pages/login" className="text-primary">Login</Link>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
+
+
+export default function SignIn() {
+  const classes = useStyles();
+  // login = (e) => {
+  //   console.log('aaa');
+  // }
+  return (
+    <Container maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <img src={require('../../../assets/images/icons/logistic_icon.png')}
+            style={{ height: '40%', width: '40%' }} />
         </div>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Tên đăng nhập"
+            name="email"
+            autoComplete="email"
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Mật khẩu"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+          <FormControlLabel
+            control={<Checkbox value="remember" color="primary" />}
+            label="Giữ đăng nhập"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          // onClick={this.login}
+          >
+            Đăng nhập
+          </Button>
+          <Grid container>
+            <Grid item xs>
+              <Link href="#" variant="body2">
+                Quên mật khẩu?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link href="#" variant="body2">
+                Tạo tải khoản
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
       </div>
-    )
-  }
+    </Container>
+  );
 }
-
-export default Register

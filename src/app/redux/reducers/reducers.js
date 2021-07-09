@@ -3,14 +3,14 @@ import { combineReducers } from 'redux'
 let initState = {
     selectedMonitor: [
         {
-            'field': 'action',
-            'title': 'Thao tác',
+            'field': 'id',
+            'title': 'TT',
             'width': '100px',
             'checked': true
         },
         {
-            'field': 'id',
-            'title': 'TT',
+            'field': 'action',
+            'title': 'Thao tác',
             'width': '100px',
             'checked': true
         },
@@ -182,6 +182,13 @@ let initState = {
     ],
     selectedBookings: [
         {
+            'field': 'id',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
             'field': 'action',
             'title': 'Thao tác',
             'width': '100px',
@@ -226,17 +233,17 @@ let initState = {
             'checked': true
         }
         ,
-        {
-            'field': 'status',
-            'title': 'Trạng thái giao hàng',
-            'width': '200px',
-            'checked': true
-        }
-        ,
+
         {
             'field': 'insurance',
             'title': 'Bảo hiểm',
             'width': '150px',
+            'checked': true
+        },
+        {
+            'field': 'status',
+            'title': 'Trạng thái đặt chuyến',
+            'width': '200px',
             'checked': true
         }],
     bookColumn: [
@@ -319,7 +326,8 @@ let initState = {
     disabledMonitor: true,
     disabledDetail: true,
 
-    navBar: 'Trang chủ'
+    navBar: 'Trang chủ',
+    dialog: false
 }
 
 function reducer(state = initState, action) {
@@ -363,6 +371,9 @@ function reducer(state = initState, action) {
             return state
         case 'CHANGE_NAVBAR':
             state['navBar'] = action.value
+            return state
+        case 'CHANGE_DIALOG':
+            state['dialog'] = action.value
             return state
         default:
             return state

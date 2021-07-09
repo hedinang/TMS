@@ -9,8 +9,11 @@ import { action } from '../../redux/actions/actions'
 class Sidebar extends Component {
 
   state = {
-    // active: ''
-  };
+    backgroundColor: 'white',
+    textColor: 'green',
+    aiOutlineMenu: 'black',
+    width: '200px',
+  }
 
   toggleMenuState(menuState) {
     if (this.state[menuState]) {
@@ -62,7 +65,7 @@ class Sidebar extends Component {
       case 'dashboard':
         strNavBar = 'Trang chủ'
         break;
-      case 'bookings':
+      case 'booking':
         strNavBar = 'Đặt chuyến'
         break;
       case '/method/vehicle':
@@ -77,17 +80,32 @@ class Sidebar extends Component {
       default:
         break;
     }
-    // let navBar = e.nativeEvent.target.id
-    // let navBar = e.nativeEvent.target.href.split('preview')[1].split('/')[1]
     this.props.dispatch(action('CHANGE_NAVBAR', strNavBar))
     this.props.click()
   }
+  clickAiOutlineMenu = (e) => {
+    document.body.classList.toggle('sidebar-icon-only')
+    if (this.state.width === '')
+      this.setState({
+        width: '200px',
+      })
+    else
+      this.setState({
+        width: '',
+      })
+  }
   render() {
+
     return (
-      <nav className="sidebar sidebar-offcanvas" id="sidebar">
-        <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <a className="sidebar-brand brand-logo"><img src={require('../../../assets/images/logo.svg')} alt="logo" /></a>
-          <AiOutlineMenu size={26} onClick={() => document.body.classList.toggle('sidebar-icon-only')} />
+      <nav className="sidebar" id="sidebar" style={{
+        backgroundColor: `${this.state.backgroundColor}`,
+        border: '1px solid rgba(0, 0, 0, 0.05)',
+      }}>
+        <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top"
+        style={{ backgroundColor: `${this.state.backgroundColor}` }}
+        >
+          <a className="sidebar-brand brand-logo"><img src={require('../../../assets/images/icons/logistic_icon.png')} alt="logo" /></a>
+          <AiOutlineMenu size={26} onClick={this.clickAiOutlineMenu} style={{ color: `${this.state.aiOutlineMenu}` }} />
         </div>
         <ul className="nav">
           <li className="nav-item profile">
@@ -130,119 +148,118 @@ class Sidebar extends Component {
               </Dropdown>
             </div>
           </li>
-
-          <li className={this.isPathActive('/dashboard') ? 'nav-item menu-items active' : 'nav-item menu-items'} >
-            <Link id='dashboard' className="nav-link" to="/dashboard" onClick={
+          <li className={this.isPathActive('/dashboard') ? 'nav-item menu-items active' : 'nav-item menu-items'}  >
+            <Link style={{ width: `${this.state.width}` }} id='dashboard' className="nav-link" to="/dashboard" onClick={
               this.changeNavBar
             }>
               <span className="menu-icon"><i className="mdi mdi-speedometer"></i></span>
-              <span className="menu-title"><Trans>Trang chủ</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Trang chủ</span>
             </Link>
           </li>
-          <li className={this.isPathActive('/bookings') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link className="nav-link" to="/bookings" id='bookings' onClick={
+          <li className={this.isPathActive('/booking') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
+            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/booking" id='booking' onClick={
               this.changeNavBar
             }>
               <span className="menu-icon">
                 <i className="mdi mdi-playlist-play"></i>
               </span>
-              <span className="menu-title"><Trans>Đặt chuyến</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Đặt chuyến</span>
             </Link>
           </li>
           <li className={this.isPathActive('/method') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div className={this.state.tablesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('tablesMenuOpen')} data-toggle="collapse">
+            <div style={{ width: `${this.state.width}` }} className={this.state.tablesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('tablesMenuOpen')} data-toggle="collapse">
               <span className="menu-icon">
                 <i className="mdi mdi-table-large"></i>
               </span>
-              <span className="menu-title"><Trans>Phương tiện</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Phương tiện</span>
               <i className="menu-arrow"></i>
             </div>
             <Collapse in={this.state.tablesMenuOpen}>
               <div>
                 <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link id='/method/vehicle' className={this.isPathActive('/method/vehicle') ? 'nav-link active' : 'nav-link'} to="/method/vehicle" onClick={
+                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/vehicle' className={this.isPathActive('/method/vehicle') ? 'nav-link active' : 'nav-link'} to="/method/vehicle" onClick={
                     this.changeNavBar
-                  }><Trans>Xe</Trans></Link></li>
-                  <li className="nav-item"> <Link id='/method/device' className={this.isPathActive('/method/device') ? 'nav-link active' : 'nav-link'} to="/method/device" onClick={
+                  }>Xe</Link></li>
+                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/device' className={this.isPathActive('/method/device') ? 'nav-link active' : 'nav-link'} to="/method/device" onClick={
                     this.changeNavBar
-                  }><Trans>Thiết bị</Trans></Link></li>
+                  }>Thiết bị</Link></li>
                 </ul>
               </div>
             </Collapse>
           </li>
           <li className={this.isPathActive('/store') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link className="nav-link" to="/store" id='store' onClick={
+            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/store" id='store' onClick={
               this.changeNavBar
             }>
               <span className="menu-icon">
                 <i className="mdi mdi-chart-bar"></i>
               </span>
-              <span className="menu-title"><Trans>Quản lý kho</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Quản lý kho</span>
             </Link>
           </li>
           <li className={this.isPathActive('/icons') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div className={this.state.iconsMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('iconsMenuOpen')} data-toggle="collapse">
+            <div style={{ width: `${this.state.width}` }} className={this.state.iconsMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('iconsMenuOpen')} data-toggle="collapse">
               <span className="menu-icon">
                 <i className="mdi mdi-contacts"></i>
               </span>
-              <span className="menu-title"><Trans>Tài xế</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Tài xế</span>
               <i className="menu-arrow"></i>
             </div>
             <Collapse in={this.state.iconsMenuOpen}>
               <div>
                 <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link className={this.isPathActive('/icons/mdi') ? 'nav-link active' : 'nav-link'} to="/icons/mdi"><Trans>Material</Trans></Link></li>
+                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} className={this.isPathActive('/icons/mdi') ? 'nav-link active' : 'nav-link'} to="/icons/mdi">Material</Link></li>
                 </ul>
               </div>
             </Collapse>
           </li>
           <li className={this.isPathActive('/user-pages') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div className={this.state.userPagesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('userPagesMenuOpen')} data-toggle="collapse">
+            <div style={{ width: `${this.state.width}` }} className={this.state.userPagesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('userPagesMenuOpen')} data-toggle="collapse">
               <span className="menu-icon">
                 <i className="mdi mdi-security"></i>
               </span>
-              <span className="menu-title"><Trans>Đấu thầu</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Đấu thầu</span>
               <i className="menu-arrow"></i>
             </div>
             <Collapse in={this.state.userPagesMenuOpen}>
               <div>
                 <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/login-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/login-1"><Trans>Login</Trans></Link></li>
-                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/register-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/register-1"><Trans>Register</Trans></Link></li>
+                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/login-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/login-1" style={{ color: `${this.state.textColor}` }} >Login</Link></li>
+                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/register-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/register-1" style={{ color: `${this.state.textColor}` }} >Register</Link></li>
                 </ul>
               </div>
             </Collapse>
           </li>
           <li className="nav-item menu-items">
-            <a className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
+            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
               <span className="menu-icon">
                 <i className="mdi mdi-file-document-box"></i>
               </span>
-              <span className="menu-title"><Trans>Quản lý nhân sự</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Quản lý nhân sự</span>
             </a>
           </li>
           <li className="nav-item menu-items">
-            <a className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
+            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
               <span className="menu-icon">
                 <i className="mdi mdi-file-document-box"></i>
               </span>
-              <span className="menu-title"><Trans>Cài đặt hệ thống</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Cài đặt hệ thống</span>
             </a>
           </li>
           <li className="nav-item menu-items">
-            <a className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
+            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
               <span className="menu-icon">
                 <i className="mdi mdi-file-document-box"></i>
               </span>
-              <span className="menu-title"><Trans>Báo cáo</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Báo cáo</span>
             </a>
           </li>
           <li className="nav-item menu-items">
-            <a className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
+            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
               <span className="menu-icon">
                 <i className="mdi mdi-file-document-box"></i>
               </span>
-              <span className="menu-title"><Trans>Cài đặt ứng</Trans></span>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Cài đặt ứng</span>
             </a>
           </li>
         </ul>

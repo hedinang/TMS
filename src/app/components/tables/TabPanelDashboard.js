@@ -137,7 +137,7 @@ class TabPanelDashboard extends Component {
                 return (
                     <div style={{ 'background-color': 'white', 'color': 'black' }}>
                         <button id='all' disabled={this.state.disabledMonitor}
-                            type="button" className="btn btn-success" onClick={this.clickMonitor}>Chọn tất</button>
+                            type="button" className="btn btn-success mt-1 mb-1" onClick={this.clickMonitor}>Chọn tất</button>
                         <div >Có {this.state.checkedMonitor}/15 loại được chọn hiển thị</div>
                         <GridList cellHeight={50} cols={6} >
                             {this.state.selectedMonitor.map(e => {
@@ -157,7 +157,7 @@ class TabPanelDashboard extends Component {
                 return (
                     <div style={{ 'background-color': 'white', 'color': 'black' }}>
                         <button id='all' disabled={this.state.disabledDetail}
-                            type="button" className="btn btn-success" onClick={this.clickDetail}>Chọn tất</button>
+                            type="button" className="btn btn-success mt-1 mb-1" onClick={this.clickDetail}>Chọn tất</button>
                         <div >Có {this.state.checkedDetail}/14 loại được chọn hiển thị</div>
                         <GridList cellHeight={50} cols={6} >
                             {this.state.selectedDetail.map(e => {

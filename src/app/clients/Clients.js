@@ -15,8 +15,10 @@ const AxiosClient = axios.create({
     headers: {
         'content-type': 'application/json'
     },
+    timeout: 50000,
     paramsSerializer: (params) => queryString.stringify(cleanParam(params))
 });
+// AxiosClient.defaults.timeout = 10000
 
 AxiosClient.interceptors.request.use(
     async (config) => {

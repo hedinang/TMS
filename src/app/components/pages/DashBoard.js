@@ -5,6 +5,7 @@ import TripMonitorService from '../../services/TripMonitorService'
 import Condition from '../../models/Condition'
 import { connect } from 'react-redux'
 import Monitor from '../tables/Monitor'
+import Detail from '../tables/Detail'
 import { action } from '../../redux/actions/actions'
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -88,9 +89,12 @@ class Dashboard extends Component {
     }
   }
   state = {
-    selected: this.props.state.selectedMonitor,
+    selectedMonitor: this.props.state.selectedMonitor,
+    selectedDetail: this.props.state.selectedDetail,
     tab: this.props.state.tabDashboard,
-    display: this.props.state.displayDashboard
+    display: this.props.state.displayDashboard,
+    textColor: 'black',
+    reload: 0
 
   }
   changeTab = (e, value) => {
@@ -129,54 +133,31 @@ class Dashboard extends Component {
       <div>
         <div className="row h-100">
           <div className="col-12">
-            <div className='text-center'>Giám sát chuyến xe</div>
-            <div >
-              <AppBar position="static" className='rounded-top'>
-                <Tabs value={this.state.tab}
-                  onChange={this.changeTab} >
-                  <Tab label="Chuyến xe" />
-                  <Tab label="Chi tiết" />
-                </Tabs>
-              </AppBar>
-              <div id='tabPanel' style={{ display: `${this.state.display}` }} >
-                <TabPanelDashboard checked={() => {
-                  this.setState({
-                    selected: this.props.state.selectedMonitor
-                  })
-                }} selected={this.state.selected} id={this.state.tab} />
-              </div>
-            </div>
-            <Monitor data={this.props.state} selected={this.props.state.selectedMonitor} />
+            <div className='text-center' style={{ color: `${this.state.textColor}` }}>Giám sát chuyến xe</div>
+            <Monitor panel='monitor' height={'400px'} reload={() => {
+              if (this.state.reload === 0)
+                this.setState({
+                  reload: 'a'
+                })
+              else this.setState({
+                reload: 0
+              })
+            }} />
           </div>
         </div>
         <div className="row">
           <div className="col-9">
-            <div className='text-center'>Chi tiết chuyến xe 11</div>
-            <div className="table-responsive text-center">
-              <Grid
-                style={{
-                  height: "600px",
-                }}
-              // data={this.props.state}
-              >
-                <Column field="ProductID" title="STT" width="50px" locked='true' />
-                <Column field="Discontinued" title='Mã khách hàng' width="100px" locked='true' />
-                <Column field="UnitPrice" title='Tên khách hàng' width="100px" />
-                <Column field="QuantityPerUnit" title='Địa chỉ' width="100px" locked='true' />
-                <Column field="Category.CategoryName" title='Điện thoại' width="100px" locked='true' />
-                <Column field="Category.CategoryName" title='Người nhận' width="100px" />
-                <Column field="Category.CategoryName" title='Trạng thái' width="100px" />
-                <Column field="Category.CategoryName" title='POD' width="100px" />
-                <Column field="Category.CategoryName" title='COD' width="100px" />
-                <Column field="Category.CategoryName" title='Số Seal' width="100px" />
-                <Column field="Category.CategoryName" title='Trọng lượng' width="100px" />
-                <Column field="Category.CategoryName" title='ETA' width="100px" />
-                <Column field="Category.CategoryName" title='ATA' width="100px" />
-              </Grid>
-            </div>
+            <Detail panel='detail' height={'400px'} data={this.state.reload} />
           </div>
           <div className="col-3">
-            <Box border={2}>
+            <Box
+              style={{
+                borderWidth: '3px',
+                borderStyle: 'solid',
+                borderColor: 'black',
+                borderRadius: '2px',
+              }}
+            >
               <div className="row col-12">Camera mã số 11, lái xe Nguyễn Văn A, lúc 12 giờ 10 phút 30 giây ngày 10 tháng 10 năm 2020</div>
               <div className="row">
                 <div className='col-12'>

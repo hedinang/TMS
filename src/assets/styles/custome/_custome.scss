@@ -1,0 +1,14 @@
+.overflow {
+    font-size: 0.875rem;
+    color: $text-muted;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: calc(85% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dropItem {
+    :hover {
+        background: #ffffff;
+    }
+}

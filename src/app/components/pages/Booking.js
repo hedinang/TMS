@@ -2,15 +2,9 @@ import React, { Component } from 'react';
 import TripMonitorService from '../../services/TripMonitorService'
 import Condition from '../../models/Condition'
 import { connect } from 'react-redux'
-import Monitor from '../tables/Monitor'
 import { action } from '../../redux/actions/actions'
-import '../../../assets/styles/custome/custome.scss'
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import TabPanelBookings from '../tables/TabPanelBookings'
-
-class Bookings extends Component {
+import Book from '../tables/Book'
+class Booking extends Component {
 
   transactionHistoryData = {
     labels: ["Paypal", "Stripe", "Cash"],
@@ -80,8 +74,8 @@ class Bookings extends Component {
   state = {
     selected: this.props.state.selectedBookings,
     tab: this.props.state.tabBookings,
-    display: this.props.state.displayBookings
-
+    display: this.props.state.displayBookings,
+    textColor: 'black',
   }
 
   changeTab = (e, value) => {
@@ -118,24 +112,8 @@ class Bookings extends Component {
   render() {
     return (
       <div>
-        <div className="mb-2">Danh sách đặt chuyến</div>
-        <div >
-          <AppBar position="static" className='rounded-top'>
-            <Tabs value={this.state.tab
-            } onChange={this.changeTab} >
-              <Tab label="Hiển thị" />
-              <Tab label="Đặt chuyến mới" />
-            </Tabs>
-          </AppBar>
-          <div id='tabPanel' style={{ display: `${this.state.display}` }} >
-            <TabPanelBookings checked={() => {
-              this.setState({
-                selected: this.props.state.selectedBookings
-              })
-            }} selected={this.state.selected} id={this.state.tab} />
-          </div>
-        </div>
-        <Monitor selected={this.state.selected} />
+        <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}` }}>Danh sách đặt chuyến</div>
+        <Book selected={this.state.selected} panel={1} height={'600px'} />
       </div >
     )
   }
@@ -145,4 +123,4 @@ function select(state) {
     state: state.reducer
   }
 }
-export default connect(select)(Bookings);
+export default connect(select)(Booking);

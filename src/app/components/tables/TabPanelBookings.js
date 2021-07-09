@@ -1,11 +1,15 @@
-import { Checkbox, GridList, GridListTile, Input, Slider, TextField } from '@material-ui/core';
 import React, { Component } from 'react';
 import { FormElement } from '@progress/kendo-react-form'
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { DateTimePicker } from "@progress/kendo-react-dateinputs";
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
-
+import { faAllergies } from '@fortawesome/fontawesome-free-solid'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+    AppBar, Button, Tab, Tabs, DialogActions, DialogContent, Input, Slider, GridListTile, GridList,
+    DialogContentText, DialogTitle, Dialog, Paper, Grid, Checkbox
+} from '@material-ui/core';
 class TabPanelBookings extends Component {
     state = {
         selectedBookings: this.props.state.selectedBookings,
@@ -69,7 +73,8 @@ class TabPanelBookings extends Component {
         time: '',
         date: '',
         checked: this.props.state.checkedBooking,
-        disabled: this.props.state.disabledBooking
+        disabled: this.props.state.disabledBooking,
+        open: true,
 
     }
 
@@ -151,13 +156,17 @@ class TabPanelBookings extends Component {
                 return (
                     <div style={{ 'background-color': 'white', 'color': 'black' }}>
                         <button id='all' disabled={this.state.disabled}
-                            type="button" className="btn btn-success" onClick={this.clickAll}>Chọn tất</button>
+                            className="btn btn-success mt-1 mb-1" onClick={this.clickAll}>
+                            <FontAwesomeIcon icon={faAllergies} className='mr-2' />
+                                Chọn tất</button>
                         <div >Có {this.state.checked}/9 loại được chọn hiển thị</div>
                         <GridList cellHeight={50} cols={6} >
                             {this.state.selectedBookings.map(e => {
                                 return <GridListTile key={e.field}>
                                     <div >
-                                        <Checkbox id={e.field}
+                                        <Checkbox
+                                            style={{ color: '#fc424a' }}
+                                            id={e.field}
                                             checked={e.checked}
                                             onClick={this.clickAll} />
                                         {e.title}
@@ -166,43 +175,105 @@ class TabPanelBookings extends Component {
                             })}
                         </GridList>
                     </div>)
-            case 1:
-                return (
-                    <div style={{ 'background-color': 'white', 'color': 'black' }}>
-                        <FormElement className='row'>
-                            <div className="col-3 ">
-                                <div>Chi phí</div>
-                                <Input name="fee" title='Chi phí' ></Input>
-                                <div>Loại xe</div>
-                                <DropDownList id='vehicle' data={this.state.vehicleType} defaultValue={this.state.vehicle} onChange={this.changeVehicle}></DropDownList>
-                                <div>
-                                    <button id='clear' type="button" className="btn btn-success mr-2">Làm mới</button>
-                                    <button id='submit' type="button" className="btn btn-success ml-2">Xác nhận</button>
-                                </div>
-                            </div>
-                            <div className="col-3 ">
-                                <div>Nơi nhận</div>
-                                <Input name="receiveAddress"></Input>
-                                <div>Nơi gửi</div>
-                                <Input name="sendAddress"></Input>
-                            </div>
-                            <div className="col-3">
-                                <div>Loại hàng hóa</div>
-                                <DropDownList id='good' data={this.props.state.goodType} defaultValue={this.props.state.good} onChange={this.changeVehicle} ></DropDownList>
-                                <div>Khối lượng hàng</div>
-                                <Slider defaultValue={this.props.state.marks[0].value}
-                                    onChange={this.handleSliderChange}
-                                    marks={this.props.state.marks} />
-                            </div>
-                            <div className="col-3">
-                                <div>Ngày</div>
-                                <DateTimePicker />
-                            </div>
-                        </FormElement>
-                    </div>
-                )
             default:
-                break;
+                return (
+                    <Dialog
+                        maxWidth='none'
+
+                        open={this.state.open}
+                        onClose={this.handleClose}
+                    // PaperComponent={this.PaperComponent}
+                    // aria-labelledby="draggable-dialog-title"
+                    >
+                        <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                            Thêm mới
+                    </DialogTitle>
+                        <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
+                            <Grid container spacing={3}>
+                                <Grid item xs={4}>
+                                    <div>Chi phí</div>
+                                    <Input name="fee" title='Chi phí' onClick={this.changeFee}></Input>
+                                    {/* <Paper >xs=4</Paper> */}
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <div>Loại xe</div>
+                                    <DropDownList id='vehicle' data={this.state.vehicleType}
+                                        defaultValue={this.state.vehicle}
+                                        onChange={this.changeDropDownList}></DropDownList>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <div>Nơi nhận</div>
+                                    <Input name="receiveAddress"></Input>
+
+                                    {/* <Paper >xs=4</Paper> */}
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <div>Nơi gửi</div>
+                                    <Input name="sendAddress"></Input>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <div>Loại hàng hóa</div>
+                                    <DropDownList id='good' data={this.props.state.goodType} defaultValue={this.props.state.good} onChange={this.changeDropDownList} ></DropDownList>
+
+                                </Grid>
+                                <Grid>
+                                    <div>Khối lượng hàng</div>
+                                    <Slider defaultValue={this.props.state.marks[0].value}
+                                        onChange={this.handleSliderChange}
+                                        marks={this.props.state.marks} />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <div>Ngày</div>
+                                    <DateTimePicker />
+                                </Grid>
+                            </Grid>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button autoFocus onClick={this.handleClose} color="primary">
+                                Hủy
+                    </Button>
+                            <Button onClick={this.handleClose} color="primary">
+                                Xác nhận
+                    </Button>
+                        </DialogActions>
+                    </Dialog>)
+            // case 1:
+            //     return (
+            //         <div style={{ 'background-color': 'white', 'color': 'black' }}>
+            //             <FormElement className='row'>
+            //                 <div className="col-3 ">
+            //                     <div>Chi phí</div>
+            //                     <Input name="fee" title='Chi phí' ></Input>
+            //                     <div>Loại xe</div>
+            //                     <DropDownList id='vehicle' data={this.state.vehicleType} defaultValue={this.state.vehicle} onChange={this.changeVehicle}></DropDownList>
+            //                     <div>
+            //                         <button id='clear' type="button" className="btn btn-success mr-2">Làm mới</button>
+            //                         <button id='submit' type="button" className="btn btn-success ml-2">Xác nhận</button>
+            //                     </div>
+            //                 </div>
+            //                 <div className="col-3 ">
+            //                     <div>Nơi nhận</div>
+            //                     <Input name="receiveAddress"></Input>
+            //                     <div>Nơi gửi</div>
+            //                     <Input name="sendAddress"></Input>
+            //                 </div>
+            //                 <div className="col-3">
+            //                     <div>Loại hàng hóa</div>
+            //                     <DropDownList id='good' data={this.props.state.goodType} defaultValue={this.props.state.good} onChange={this.changeVehicle} ></DropDownList>
+            //                     <div>Khối lượng hàng</div>
+            //                     <Slider defaultValue={this.props.state.marks[0].value}
+            //                         onChange={this.handleSliderChange}
+            //                         marks={this.props.state.marks} />
+            //                 </div>
+            //                 <div className="col-3">
+            //                     <div>Ngày</div>
+            //                     <DateTimePicker />
+            //                 </div>
+            //             </FormElement>
+            //         </div>
+            //     )
+            // default:
+            //     break;
         }
     }
 }

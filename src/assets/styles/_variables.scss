@@ -105,13 +105,14 @@ $content-padding: 1.875rem 1.75rem;
 ////////// CONTENT WRAPPER //////////
 
 ////////// SIDEBAR ////////
-$sidebar-width-lg: 244px;
+$sidebar-width-lg: 200px;
 $sidebar-width-mini: 185px;
 $sidebar-width-icon: 70px;
 
 $sidebar-bg: #191c24;
 $sidebar-menu-color: $text-muted;
-$sidebar-menu-active-bg: darken($sidebar-bg, 5%);
+// $sidebar-menu-active-bg: darken($sidebar-bg, 5%);
+$sidebar-menu-active-bg:rgb(224, 231, 216);
 $sidebar-menu-active-color: #ffffff;
 $sidebar-menu-hover-bg: darken($sidebar-bg, 5%);
 $sidebar-menu-hover-color: color(white);
@@ -120,7 +121,8 @@ $sidebar-submenu-hover-bg: initial;
 $sidebar-submenu-hover-color: #ffffff;
 
 $sidebar-menu-icon-color: #bba8bff5;
-$sidebar-menu-arrow-color: rgba($text-muted, 0.36);
+// $sidebar-menu-arrow-color: rgba($text-muted, 0.36);
+$sidebar-menu-arrow-color: #fc0808;
 
 $sidebar-menu-font-size: 0.9375rem;
 $sidebar-menu-padding-y: 0.8rem;
@@ -154,11 +156,12 @@ $navbar-menu-color: #ffffff;
 $navbar-font-size: .9375rem;
 $navbar-icon-font-size: 1.125rem;
 $navbar-box-shadow: 20px 19px 34px -15px rgba(0,0,0,0.5);
+// $navbar-box-shadow:20px 19px 34px -15px rgba(255, 255, 255, 0.5);
 
 ///////// NAVBAR ////////
 
 ///////// CARD ////////
-$card-bg: #191c24;
+$card-bg: #ffffff;
 $card-description-color: #bfbfbf;
 $card-title-color: #ffffff;
 ///////// CARD ////////
