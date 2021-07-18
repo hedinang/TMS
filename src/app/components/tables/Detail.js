@@ -1,5 +1,5 @@
 import Paper from '@material-ui/core/Paper';
-import ToolbarPanel from '../pages/method/ToolbarPanel';
+import ToolbarPanel from '../shared/ToolbarPanel';
 import { action } from '../../redux/actions/actions'
 import { connect } from 'react-redux'
 import {

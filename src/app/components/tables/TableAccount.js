@@ -10,24 +10,24 @@ import {
     TableColumnReordering, TableColumnVisibility, TableFixedColumns, Grid, GroupingPanel,
     PagingPanel, Table, TableFilterRow, TableHeaderRow, Toolbar,
 } from '@devexpress/dx-react-grid-material-ui';
-import { faTrashAlt, faPencilAlt } from '@fortawesome/fontawesome-free-solid'
+import { faTrashAlt, faPencilAlt, faPowerOff } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { Component } from 'react';
-class Book extends Component {
+import Condition from '../../models/Condition';
+import UserService from '../../services/UserService';
+import RoleService from '../../services/RoleService';
+class TableAccount extends Component {
     state = {
-        data: [{
-            action: 'action',
-            bookingCode: 'tripId',
-            shipperName: 'name',
-            contactNumber: 'phone',
-            city: 'address',
-            vehicleType: 'type',
-            vehicleNumber: 'licensePlate',
-            status: 'status',
-            insurance: 'insurance'
-        }],
+        data: {
+            user: [],
+            role: []
+        },
         reload: 0
 
+    }
+    componentWillMount() {
+        this.getUser()
+        this.getRole()
     }
     ActionFormatter = (value) => {
         return (
@@ -37,6 +37,9 @@ class Book extends Component {
                 </button>
                 <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPencilAlt} />
+                </button>
+                <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
+                    <FontAwesomeIcon icon={faPowerOff} />
                 </button>
             </div>
         )
@@ -48,13 +51,19 @@ class Book extends Component {
                     padding: '.5em .75em',
                     textAlign: 'center', background: '#feac08',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Đang giao</span>
+                }}>Đang chờ</span>
+            case 1:
+                return <span style={{
+                    padding: '.5em .75em',
+                    textAlign: 'center', background: '#fc424a',
+                    borderRadius: '0.25rem', color: 'white',
+                }}>Đang khóa</span>
             default:
                 return <span style={{
                     padding: '.5em .75em',
                     textAlign: 'center', background: '#0abb87',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Đã giao</span>
+                }}>Đã kích hoạt</span>
 
 
         }
@@ -72,102 +81,57 @@ class Book extends Component {
             {...props}
         />
     )
-    // let columnOrder = ['product', 'region', 'amount', 'saleDate', 'customer', 'channel', 'abc', 'xyz', 'a', 'warning', 'sector', 'action']
-    // let setColumnOrder = ['product', 'region', 'amount', 'saleDate', 'customer', 'channel', 'abc', 'xyz', 'a', 'warning', 'sector', 'action']
-    // const defaultHiddenColumnNames = []
+    getUser() {
+        let userService = new UserService();
+        let pages = [1, 10, "id", 0]
+        let conditions = []
+        let condition = new Condition(pages, conditions)
+        userService.search(condition).then(value => {
+            this.setState({
+                data: {
+                    user: value.result
+                }
+            })
+        }).catch(error => {
+            console.log('aaaa');
+        })
+    }
+    getRole() {
+        let roleService = new RoleService();
+        let pages = [1, 10, "id", 0]
+        let conditions = []
+        let condition = new Condition(pages, conditions)
+        roleService.search(condition).then(value => {
+            this.setState({
+                data: {
+                    user: this.state.data.user,
+                    role: value.result
+                }
+            })
+        }).catch(error => {
+            console.log('aaaa');
+        })
+    }
+
+
+
     render() {
-        let selectedBookings = []
-        this.props.state.selectedBookings.forEach(e => {
+        let selectedAccount = []
+        this.props.state.selectedAccount.forEach(e => {
             if (e.checked === true)
-                selectedBookings.push(
+                selectedAccount.push(
                     {
                         name: e.field,
                         title: e.title
                     }
                 )
         })
-        let data = [{
-            id: 1111111,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 0,
-        },
-        {
-            id: 1111112,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 1,
-        },
-        {
-            id: 1111111,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 0,
-        },
-        {
-            id: 1111112,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 1,
-        },
-        {
-            id: 1111111,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 0,
-        },
-        {
-            id: 1111112,
-            action: '11',
-            bookingCode: '22',
-            shipperName: '33',
-            contactNumber: '44',
-            city: '55',
-            vehicleType: '66',
-            vehicleNumber: '77',
-            insurance: '88',
-            status: 1,
-        }]
-        let leftColumns = ['id', 'action', 'bookingCode', 'shipperName']
-        // let leftColumns = ['action', 'bookingCode', 'shipperName']
+        let leftColumns = ['id', 'action', 'name']
         let rightColumns = ['status']
         let tableColumnExtensions = [
             { columnName: 'id', width: 180 },
             { columnName: 'action', width: 180 },
-            { columnName: 'bookingCode', width: 200 },
-            { columnName: 'shipperName', width: 180 },
-            { columnName: 'contactNumber', width: 230 },
-            { columnName: 'city', width: 170 },
+            { columnName: 'name', width: 200 },
             { columnName: 'status', width: 170 },
         ];
         let actionColumns = ['action']
@@ -185,13 +149,9 @@ class Book extends Component {
             <Paper>
                 <Grid
                     xs={12}
-                    rows={data}
-                    columns={selectedBookings}
-                >
-                    {/* <SortingState
-                        defaultSorting={[{ columnName: 'saleDate', direction: 'asc' }]}
-                    /> */}
-                    {/* <IntegratedSorting /> */}
+                    rows={this.state.data.user}
+                    columns={selectedAccount} >
+
                     <this.ActionTypeProvider
                         for={actionColumns}
                     />
@@ -199,21 +159,14 @@ class Book extends Component {
                         for={statusColumns}
                     />
                     <FilteringState
-                        // defaultFilters={defaultFilters}
                         columnExtensions={filteringStateColumnExtensions}
                     />
                     <IntegratedFiltering />
-                    {/* <DragDropProvider /> */}
                     <Table
-                        columnExtensions={tableColumnExtensions}
+                    // columnExtensions={tableColumnExtensions}
                     />
-                    {/* <TableColumnReordering
-                        order={columnOrder}
-                        onOrderChange={setColumnOrder}
-                    /> */}
-                    <TableHeaderRow
-                    // showSortingControls 
-                    />
+
+                    <TableHeaderRow />
                     <TableFilterRow />
                     <TableFixedColumns
                         leftColumns={leftColumns}
@@ -227,13 +180,9 @@ class Book extends Component {
                     />
                     <IntegratedPaging />
                     <TableColumnVisibility
-
-                    // defaultHiddenColumnNames={defaultHiddenColumnNames}
                     />
                     <Toolbar />
-                    {/* <ToolbarButton /> */}
-
-                    <ToolbarPanel panel={this.props.panel} reload={() => {
+                    <ToolbarPanel data={this.state.data} panel={this.props.panel} reload={() => {
                         if (this.state.reload === 0)
                             this.setState({
                                 reload: 1
@@ -257,7 +206,7 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(Book);
+export default connect(select)(TableAccount);
 
 
 

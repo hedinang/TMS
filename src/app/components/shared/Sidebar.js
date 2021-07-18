@@ -5,7 +5,8 @@ import { Trans } from 'react-i18next';
 import { AiOutlineMenu } from 'react-icons/ai'
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
-
+import { faAngleDown } from '@fortawesome/fontawesome-free-solid'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 class Sidebar extends Component {
 
   state = {
@@ -102,7 +103,7 @@ class Sidebar extends Component {
         border: '1px solid rgba(0, 0, 0, 0.05)',
       }}>
         <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top"
-        style={{ backgroundColor: `${this.state.backgroundColor}` }}
+          style={{ backgroundColor: `${this.state.backgroundColor}` }}
         >
           <a className="sidebar-brand brand-logo"><img src={require('../../../assets/images/icons/logistic_icon.png')} alt="logo" /></a>
           <AiOutlineMenu size={26} onClick={this.clickAiOutlineMenu} style={{ color: `${this.state.aiOutlineMenu}` }} />
@@ -149,17 +150,21 @@ class Sidebar extends Component {
             </div>
           </li>
           <li className={this.isPathActive('/dashboard') ? 'nav-item menu-items active' : 'nav-item menu-items'}  >
-            <Link style={{ width: `${this.state.width}` }} id='dashboard' className="nav-link" to="/dashboard" onClick={
-              this.changeNavBar
-            }>
+            <Link style={{ width: `${this.state.width}` }} id='dashboard' className="nav-link" to="/dashboard"
+            //  onClick={
+            //   this.changeNavBar
+            // }
+            >
               <span className="menu-icon"><i className="mdi mdi-speedometer"></i></span>
               <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Trang chủ</span>
             </Link>
           </li>
           <li className={this.isPathActive('/booking') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/booking" id='booking' onClick={
-              this.changeNavBar
-            }>
+            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/booking" id='booking'
+            // onClick={
+            //   this.changeNavBar
+            // }
+            >
               <span className="menu-icon">
                 <i className="mdi mdi-playlist-play"></i>
               </span>
@@ -172,25 +177,25 @@ class Sidebar extends Component {
                 <i className="mdi mdi-table-large"></i>
               </span>
               <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Phương tiện</span>
-              <i className="menu-arrow"></i>
+              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
             </div>
             <Collapse in={this.state.tablesMenuOpen}>
               <div>
                 <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/vehicle' className={this.isPathActive('/method/vehicle') ? 'nav-link active' : 'nav-link'} to="/method/vehicle" onClick={
-                    this.changeNavBar
-                  }>Xe</Link></li>
-                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/device' className={this.isPathActive('/method/device') ? 'nav-link active' : 'nav-link'} to="/method/device" onClick={
-                    this.changeNavBar
-                  }>Thiết bị</Link></li>
+                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/vehicle' className={this.isPathActive('/method/vehicle') ? 'nav-link active' : 'nav-link'} to="/method/vehicle"
+                  // onClick={ this.changeNavBar}
+                  >Xe</Link></li>
+                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/device' className={this.isPathActive('/method/device') ? 'nav-link active' : 'nav-link'} to="/method/device"
+                  // onClick={this.changeNavBar}
+                  >Thiết bị</Link></li>
                 </ul>
               </div>
             </Collapse>
           </li>
           <li className={this.isPathActive('/store') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/store" id='store' onClick={
-              this.changeNavBar
-            }>
+            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/store" id='store'
+            // onClick={this.changeNavBar}
+            >
               <span className="menu-icon">
                 <i className="mdi mdi-chart-bar"></i>
               </span>
@@ -203,23 +208,26 @@ class Sidebar extends Component {
                 <i className="mdi mdi-contacts"></i>
               </span>
               <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Tài xế</span>
-              <i className="menu-arrow"></i>
+              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
+
             </div>
-            <Collapse in={this.state.iconsMenuOpen}>
+            <Collapse >
               <div>
                 <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} className={this.isPathActive('/icons/mdi') ? 'nav-link active' : 'nav-link'} to="/icons/mdi">Material</Link></li>
+                  <li className="nav-item">
+                    <Link style={{ color: `${this.state.textColor}` }} className={this.isPathActive('/icons/mdi') ? 'nav-link active' : 'nav-link'} to="/icons/mdi">Material</Link>
+                  </li>
                 </ul>
               </div>
             </Collapse>
           </li>
-          <li className={this.isPathActive('/user-pages') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
+          <li className={this.isPathActive('/abc') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
             <div style={{ width: `${this.state.width}` }} className={this.state.userPagesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('userPagesMenuOpen')} data-toggle="collapse">
               <span className="menu-icon">
                 <i className="mdi mdi-security"></i>
               </span>
               <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Đấu thầu</span>
-              <i className="menu-arrow"></i>
+              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
             </div>
             <Collapse in={this.state.userPagesMenuOpen}>
               <div>
@@ -230,13 +238,27 @@ class Sidebar extends Component {
               </div>
             </Collapse>
           </li>
-          <li className="nav-item menu-items">
-            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
+          <li className={this.isPathActive('/employee') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
+            <div style={{ width: `${this.state.width}` }} className={this.state.iconsMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('iconsMenuOpen')}>
               <span className="menu-icon">
                 <i className="mdi mdi-file-document-box"></i>
               </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Quản lý nhân sự</span>
-            </a>
+              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Quản lý nhân sự</span>
+              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
+            </div>
+            <Collapse in={this.state.iconsMenuOpen}>
+              <div>
+                <ul className="nav flex-column sub-menu">
+                  <li className="nav-item">
+                    <Link style={{ color: `${this.state.textColor}` }} className="nav-link" to="/employee/account" id='/employee/account'>Tài khoản</Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link style={{ color: `${this.state.textColor}` }} className="nav-link" to="/employee/role" id='/employee/role'>Phân quyền</Link>
+                  </li>
+                </ul>
+              </div>
+            </Collapse>
+
           </li>
           <li className="nav-item menu-items">
             <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">

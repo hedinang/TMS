@@ -10,9 +10,10 @@ import {
     AppBar, Button, Tab, Tabs, DialogActions, DialogContent, Input, Slider, GridListTile, GridList,
     DialogContentText, DialogTitle, Dialog, Paper, Grid, Checkbox, MenuItem, Select
 } from '@material-ui/core';
-class TabPanelBookings extends Component {
+import TabCustome from '../shared/TabCustome'
+class TabPanelAccount extends Component {
     state = {
-        selectedBookings: this.props.state.selectedBookings,
+        selectedAccount: this.props.state.selectedAccount,
         bookColumn: [
             {
                 'field': 'fee',
@@ -72,8 +73,8 @@ class TabPanelBookings extends Component {
         ],
         time: '',
         date: '',
-        checked: this.props.state.checkedBooking,
-        disabled: this.props.state.disabledBooking,
+        checked: this.props.state.checkedAccount,
+        disabled: this.props.state.disabledAccount,
         open: true,
 
     }
@@ -107,8 +108,8 @@ class TabPanelBookings extends Component {
     clickAll = (event) => {
         if (event.nativeEvent.target.id === 'all') {
             this.setState({
-                selectedBookings: [
-                    ...this.state.selectedBookings.map(e => {
+                selectedAccount: [
+                    ...this.state.selectedAccount.map(e => {
                         e.checked = true
                         return e
                     })
@@ -116,12 +117,12 @@ class TabPanelBookings extends Component {
                 checked: 9,
                 disabled: true
             })
-            this.props.dispatch(action('CHANGE_CHECKED', 9))
+            this.props.dispatch(action('CHANGE_CHECKED_ACCOUNT', 9))
         } else {
             let checked = this.state.checked
             this.setState({
-                selectedBookings: [
-                    ...this.state.selectedBookings.map(e => {
+                selectedAccount: [
+                    ...this.state.selectedAccount.map(e => {
                         if (e.field === event.nativeEvent.target.id) {
                             if (e.checked === true) {
                                 e.checked = false
@@ -146,7 +147,7 @@ class TabPanelBookings extends Component {
                     disabled: false
                 })
             }
-            this.props.dispatch(action('CHANGE_CHECKED', checked))
+            this.props.dispatch(action('CHANGE_CHECKED_ACCOUNT', checked))
         }
         this.props.checked()
     }
@@ -167,7 +168,7 @@ class TabPanelBookings extends Component {
                                 Chọn tất</button>
                         <div >Có {this.state.checked}/9 loại được chọn hiển thị</div>
                         <GridList cellHeight={50} cols={6} >
-                            {this.state.selectedBookings.map(e => {
+                            {this.state.selectedAccount.map(e => {
                                 return <GridListTile key={e.field}>
                                     <div >
                                         <Checkbox
@@ -182,6 +183,7 @@ class TabPanelBookings extends Component {
                         </GridList>
                     </div>)
             default:
+                // this.props.addItem()
                 return <div></div>
         }
     }
@@ -191,4 +193,4 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(TabPanelBookings);
+export default connect(select)(TabPanelAccount);

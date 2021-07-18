@@ -1,16 +1,24 @@
-import { Checkbox, GridList, GridListTile} from '@material-ui/core';
+import { Checkbox, GridList, GridListTile } from '@material-ui/core';
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
-
-class TabPanelDashboard extends Component {
+import {
+    TableTreeColumn, Grid, GroupingPanel,
+    PagingPanel, Table, TableFilterRow, TableHeaderRow, Toolbar,
+} from '@devexpress/dx-react-grid-material-ui'
+import {
+    TreeDataState,
+    CustomTreeData,
+} from '@devexpress/dx-react-grid';
+import { Paper, AppBar, Tab, Tabs, } from '@material-ui/core';
+class TabPanelRole extends Component {
     state = {
         selectedMonitor: this.props.state.selectedMonitor,
         selectedDetail: this.props.state.selectedDetail,
         checkedMonitor: this.props.state.checkedMonitor,
         checkedDetail: this.props.state.checkedDetail,
         disabledMonitor: this.props.state.disabledMonitor,
-        disabledDetail: this.props.state.disabledDetail
+        disabledDetail: this.props.state.disabledDetail,
     }
 
     handleSliderChange = (event, newValue) => {
@@ -131,28 +139,51 @@ class TabPanelDashboard extends Component {
         }
         this.props.checked()
     }
-    
+    getChildRows = (row, rootRows) => {
+        return (row ? row.items : rootRows)
+    }
     render() {
+        let data = [
+            {
+                role: "Shipper",
+                items: [{
+                    role: "create_account",
+                    name: "Tạo tài khoản",
+                },
+                {
+                    role: "open_bid",
+                    name: "mở thầu",
+                },
+                {
+                    role: "choose",
+                    name: "Chỉ định thầu",
+                }]
+            }
+        ]
+        let columns = [
+            { name: 'role', title: 'Quyền' },
+
+        ]
         switch (this.props.id) {
             case 0:
                 return (
-                    <div style={{ 'background-color': 'white', 'color': 'black' }}>
-                        <button id='all' disabled={this.state.disabledMonitor}
-                            type="button" className="btn btn-success mt-1 mb-1" onClick={this.clickMonitor}>Chọn tất</button>
-                        <div >Có {this.state.checkedMonitor}/15 loại được chọn hiển thị</div>
-                        <GridList cellHeight={50} cols={6} >
-                            {this.state.selectedMonitor.map(e => {
-                                return <GridListTile key={e.field}>
-                                    <div >
-                                        <Checkbox id={e.field}
-                                            checked={e.checked}
-                                            onClick={this.clickMonitor} />
-                                        {e.title}
-                                    </div>
-                                </GridListTile>
-                            })}
-                        </GridList>
-                    </div>
+                    <Paper >
+                        <Grid
+                            rows={data}
+                            columns={columns}
+                        >
+                            <TreeDataState />
+                            <CustomTreeData
+                                getChildRows={this.getChildRows}
+                            />
+                            <Table
+                            // columnExtensions={tableColumnExtensions}
+                            />
+                            <TableTreeColumn
+                                for="role"
+                            />
+                        </Grid>
+                    </Paper>
                 )
             case 1:
                 return (
@@ -184,4 +215,4 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(TabPanelDashboard);
+export default connect(select)(TabPanelRole);

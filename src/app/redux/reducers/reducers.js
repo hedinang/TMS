@@ -246,6 +246,71 @@ let initState = {
             'width': '200px',
             'checked': true
         }],
+    selectedAccount: [
+        {
+            'field': 'id',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'name',
+            'title': 'Tên',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'email',
+            'title': 'Email',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'phone',
+            'title': 'Số điện thoại',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'roleName',
+            'title': 'Vai trò',
+            'width': '100px',
+            'checked': true
+
+        },
+
+        {
+            'field': 'parentId',
+            'title': 'Mã quản lý',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'parentName',
+            'title': 'Tên quản lý',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'status',
+            'title': 'Trạng thái',
+            'width': '100px',
+            'checked': true
+
+        }
+    ],
     bookColumn: [
         {
             'field': 'fee',
@@ -307,24 +372,30 @@ let initState = {
     time: '',
     date: '',
     vehicle: '',
-    good: '',
+    good: 'aaa',
 
     tabDashboard: 0,
     tabBookings: 0,
+    tabAccount: 0,
+    tabRole: 0,
 
     displayDashboard: 'none',
     displayBookings: 'none',
+    displayAccount: 'none',
 
     selectStateBookings: false,
     selectStateDashboard: false,
+    selectStateAccount: false,
 
     checkedMonitor: 15,
     checkedDetail: 14,
     checkedBooking: 9,
+    checkedAccount: 9,
 
     disabledBooking: true,
     disabledMonitor: true,
     disabledDetail: true,
+    disabledAccount: true,
 
     navBar: 'Trang chủ',
     dialog: false
@@ -365,6 +436,13 @@ function reducer(state = initState, action) {
         case 'CHANGE_CHECKED_DETAIL':
             state['checkedDetail'] = action.value
             if (action.value === 14)
+                state['disabledDetail'] = true
+            else
+                state['disabledDetail'] = false
+            return state
+        case 'CHANGE_CHECKED_ACCOUNT':
+            state['checkedDetail'] = action.value
+            if (action.value === 9)
                 state['disabledDetail'] = true
             else
                 state['disabledDetail'] = false

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
 
-class TabPanelDashboard extends Component {
+class TabCustome extends Component {
     state = {
         selectedMonitor: this.props.state.selectedMonitor,
         selectedDetail: this.props.state.selectedDetail,
@@ -184,4 +184,4 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(TabPanelDashboard);
+export default connect(select)(TabCustome);

@@ -27,6 +27,12 @@ class App extends Component {
       case '/store':
         path = 'Quản lý kho'
         break;
+      case '/employee/account':
+        path = 'Quản lý nhân sự'
+        break;
+      case '/employee/role':
+        path = 'Quản lý nhân sự'
+        break;
       default:
         break;
     }
@@ -47,14 +53,18 @@ class App extends Component {
     }
     else {
       return (
-        <div className="container-scroller">
-          <Sidebar click={() => {
-            this.setState({
-              navBar: this.props.state.navBar
-            })
-          }} />
+        <div className="container-scroller" >
+          <Sidebar
+          // click={() => {
+          //   this.setState({
+          //     navBar: this.props.state.navBar
+          //   })
+          // }} 
+          />
           <div className="container-fluid page-body-wrapper">
-            <Navbar navBar={this.state.navBar} />
+            <Navbar
+            //  navBar={this.state.navBar}
+            />
             <div className="main-panel">
               <div className='content-wrapper'
                 style={{ background: `${this.state.backgroundColor}` }}

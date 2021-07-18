@@ -25,15 +25,17 @@ class Navbar extends Component {
   render() {
     return (
       <nav className={"p-0 fixed-top d-flex flex-row " + "navbar"}
-        style={{ background: `${this.state.backgroundColor}` }}
+        style={{ background: `${this.state.backgroundColor}`, }}
       >
         <div className="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
           <Link className="navbar-brand brand-logo-mini" to="/"><img src={require('../../../assets/images/logo-mini.svg')} alt="logo" /></Link>
         </div>
         <div className="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
           <ul className="navbar-nav w-100">
-            <li className="nav-item w-25" style={{ textAlign: "center", color: `${this.state.textColor}` }}>
-              {this.props.navBar}
+            <li className="nav-item w-25" >
+              {/* // style={{ textAlign: "center", color: `${this.state.textColor}` }}> */}
+              {/* {this.props.navBar} */}
+              {/* a */}
             </li>
             <li className="nav-item w-75">
               <form className="nav-link mt-2 mt-md-0 d-none d-lg-flex search" >
@@ -52,7 +54,7 @@ class Navbar extends Component {
                 <BsToggleOn style={{ color: `${this.state.textColor}` }} />
               </a>
             </li>
-            <Dropdown alignRight as="li" className="nav-item border-left dropItem" >
+            <Dropdown alignRight as="li" className="nav-item  dropItem" >
               <Dropdown.Toggle as="a" className="nav-link count-indicator cursor-pointer">
                 <i className="mdi mdi-email" style={{ color: `${this.state.textColor}` }}></i>
                 <span className="count bg-success" style={{ fontSize: '15px' }}>7</span>
@@ -108,7 +110,7 @@ class Navbar extends Component {
                 <p className="p-3 mb-0 text-center" style={{ color: `${this.state.textColor}` }}>Xem tất cả trong Messenger</p>
               </Dropdown.Menu>
             </Dropdown>
-            <Dropdown alignRight as="li" className="nav-item border-left dropItem">
+            <Dropdown alignRight as="li" className="nav-item  dropItem">
               <Dropdown.Toggle as="a" className="nav-link count-indicator cursor-pointer">
                 <i className="mdi mdi-bell" style={{ color: `${this.state.textColor}` }}></i>
                 <span className="count bg-danger" style={{ fontSize: '15px' }}>5</span>

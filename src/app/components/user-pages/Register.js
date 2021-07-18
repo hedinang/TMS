@@ -32,9 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
-  // login = (e) => {
-  //   console.log('aaa');
-  // }
+
   return (
     <Container maxWidth="xs">
       <CssBaseline />

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import TripMonitorService from '../../services/TripMonitorService'
-import Condition from '../../models/Condition'
+import TripMonitorService from '../../../services/TripMonitorService'
+import Condition from '../../../models/Condition'
 import { connect } from 'react-redux'
-import { action } from '../../redux/actions/actions'
-import Book from '../tables/Book'
-class Booking extends Component {
+import { action } from '../../../redux/actions/actions'
+import TableAccount from '../../tables/TableAccount'
+class Account extends Component {
 
   transactionHistoryData = {
     labels: ["Paypal", "Stripe", "Cash"],
@@ -72,9 +72,9 @@ class Booking extends Component {
   }
 
   state = {
-    selected: this.props.state.selectedBookings,
-    tab: this.props.state.tabBookings,
-    display: this.props.state.displayBookings,
+    selected: this.props.state.selectedAccount,
+    tab: this.props.state.tabAccount,
+    display: this.props.state.displayAccount,
     textColor: 'black',
   }
 
@@ -112,8 +112,8 @@ class Booking extends Component {
   render() {
     return (
       <div>
-        <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}`, overflow: 'visible' }}>Danh sách đặt chuyến</div>
-        <Book selected={this.state.selected} panel={1} height={'600px'} />
+        <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}`, overflow: 'visible' }}>Danh sách nhân sự</div>
+        <TableAccount selected={this.state.selected} panel={'account'} height={'600px'} />
       </div >
     )
   }
@@ -123,4 +123,4 @@ function select(state) {
     state: state.reducer
   }
 }
-export default connect(select)(Booking);
+export default connect(select)(Account);

@@ -21,11 +21,13 @@ class ToolbarButton extends React.PureComponent {
 
     render() {
         return (
-            <Plugin>
-                <Template name="toolbarContent" >
-                    <TemplatePlaceholder />
-                    <div><FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
-                        <span>Tạo mới</span></div>
+            <Plugin >
+                <Template name="toolbarContent">
+                    {/* <TemplatePlaceholder /> */}
+                    <div style={{ textAlign: 'text-top' }}>
+                        <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
+                        <span>Tạo mới</span>
+                    </div>
                 </Template>
             </Plugin>
         );
