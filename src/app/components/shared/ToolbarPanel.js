@@ -14,10 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import TabPanelDashboard from '../tables/TabPanelDashboard';
 import TabCustome from './TabCustome'
 import TabPanelAccount from '../tables/TabPanelAccount';
-import RoleService from '../../services/RoleService';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import UserService from '../../services/UserService';
-import { DialogAccount, Delete, AlertCustom } from '../dialog/DialogAccount'
+import { DialogCreateAccount, DialogEditAccount } from '../dialog/DialogAccount'
 class ToolbarPanel extends React.PureComponent {
     state = {
         selectedBooking: this.props.state.selectedBookings,
@@ -54,8 +51,19 @@ class ToolbarPanel extends React.PureComponent {
         account: {
             open: false,
 
+        },
+        edit: {
+            username: '',
+            password: '',
+            name: '',
+            email: '',
+            phone: '',
+            role: '',
+            status: '',
+            parentId: '',
         }
     }
+
     changeTab = (e, value) => {
         if (this.props.state.selectStateBookings === true) {
             if (this.props.state.tabBookings === value) {
@@ -169,9 +177,41 @@ class ToolbarPanel extends React.PureComponent {
         }
     }
     addItem = (event) => {
-        console.log('aaa');
+        switch (event) {
+            case 'CREATE_USER_SUCCESS':
+                this.setState({
+                    account: false
+                })
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+        this.props.addItem(event)
+
+    }
+    cancel = (event) => {
+        switch (event) {
+            case 1:
+                this.setState({
+                    account: {
+                        open: false,
+                    }
+                })
+                break;
+            case 2:
+                this.props.cancel(2)
+                break;
+            default:
+                break;
+        }
+
     }
 
+    confirm = (event) => {
+
+    }
     selectPanel = () => {
         switch (this.props.panel) {
             case 'monitor':
@@ -204,6 +244,10 @@ class ToolbarPanel extends React.PureComponent {
                     Chi tiết chuyến xe 2345
                 </div>
             case 'account':
+                let data = {
+                    user: this.props.user,
+                    role: this.props.role
+                }
                 return <div style={{ width: '80rem', borderStyle: 'none', }}>
                     <AppBar position="static" className='rounded-top' style={{
                         background: 'white', color: 'black',
@@ -216,11 +260,29 @@ class ToolbarPanel extends React.PureComponent {
                                 <FontAwesomeIcon icon={faEye} className='mr-2' />
                                 <span>Hiển thị</span>
                             </div>} />
-                            <Tab id='tab' style={{ opacity: 1 }} label={<div>
-                                <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
-                                <span>Tạo mới</span>
-                                <DialogAccount open={this.state.account} data={this.props.data} />
-                            </div>}
+                            <Tab
+                                id='tab' style={{ opacity: 1 }} label={<div>
+                                    <button
+                                        style={{ border: 'none', textTransform: 'uppercase' }}
+                                        onClick={
+                                            e => {
+                                                this.setState({
+                                                    account: {
+                                                        open: true,
+                                                        id: 0
+                                                    }
+                                                })
+                                            }
+                                        }>
+                                        <FontAwesomeIcon
+                                            icon={faPlusSquare} className='mr-2' />
+                                        <span>Tạo mới</span>
+                                    </button>
+                                    <DialogCreateAccount open={this.state.account}
+                                        confirm={this.addItem} cancel={this.cancel} />
+                                    <DialogEditAccount data={data} edit={this.props.edit}
+                                        confirm={this.addItem} cancel={this.cancel} />
+                                </div>}
                             />
                         </Tabs>
                     </AppBar>
@@ -230,7 +292,7 @@ class ToolbarPanel extends React.PureComponent {
                             this.setState({
                                 selectedAccount: this.props.state.selectedAccount
                             })
-                        }} selected={this.state.selectedAccount} id={this.props.state.tabAccount} addItem={this.addItem} />
+                        }} selected={this.state.selectedAccount} id={this.props.state.tabAccount} />
                     </div>
                 </div>
 

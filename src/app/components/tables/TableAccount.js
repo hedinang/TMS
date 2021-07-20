@@ -16,29 +16,100 @@ import React, { Component } from 'react';
 import Condition from '../../models/Condition';
 import UserService from '../../services/UserService';
 import RoleService from '../../services/RoleService';
+import { Delete, AlertCustom } from '../dialog/DialogAccount'
 class TableAccount extends Component {
     state = {
-        data: {
-            user: [],
-            role: []
+        user: [],
+        role: [],
+        reload: 0,
+        value: {
+            show: false,
+            message: ''
         },
-        reload: 0
+        delete: {
+            show: false,
+            name: '',
+            id: '',
+            email: ''
+        },
+        edit: {
+            open: false,
 
+        }
     }
     componentWillMount() {
         this.getUser()
         this.getRole()
     }
+    clickTrash = (event) => {
+        let id = event.currentTarget.id.split('&')[1]
+        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
+        this.setState({
+            delete: {
+                show: true,
+                id: remove.id,
+                name: remove.name,
+                email: remove.email,
+                action: 'DELETE_USER'
+            }
+        })
+    }
+
+    clickEdit = (event) => {
+        let id = event.currentTarget.id.split('&')[1]
+        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
+        this.setState({
+            edit: {
+                open: true,
+                id: remove.id,
+                name: remove.name,
+                email: remove.email,
+                phone: remove.phone,
+                username: remove.username,
+                roleId: remove.roleId,
+                roleName: remove.roleName,
+                status: remove.status,
+                parentName: remove.parentName,
+                parentId: remove.parentId,
+                parentName: remove.parentName,
+                action: 0
+            }
+        })
+
+    }
+    clickReset = (event) => {
+        let id = event.currentTarget.id.split('&')[1]
+        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
+        this.setState({
+            delete: {
+                show: true,
+                id: remove.id,
+                name: remove.name,
+                email: remove.email,
+                action: 'RESET_USER'
+            }
+        })
+    }
+
     ActionFormatter = (value) => {
         return (
             <div>
-                <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
+                <button
+                    id={'trash&' + value.row.id}
+                    onClick={this.clickTrash}
+                    style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
-                <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
+                <button
+                    id={'edit&' + value.row.id}
+                    onClick={this.clickEdit}
+                    style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPencilAlt} />
                 </button>
-                <button style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
+                <button
+                    id={'reset&' + value.row.id}
+                    onClick={this.clickReset}
+                    style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPowerOff} />
                 </button>
             </div>
@@ -88,9 +159,7 @@ class TableAccount extends Component {
         let condition = new Condition(pages, conditions)
         userService.search(condition).then(value => {
             this.setState({
-                data: {
-                    user: value.result
-                }
+                user: value.result
             })
         }).catch(error => {
             console.log('aaaa');
@@ -103,17 +172,100 @@ class TableAccount extends Component {
         let condition = new Condition(pages, conditions)
         roleService.search(condition).then(value => {
             this.setState({
-                data: {
-                    user: this.state.data.user,
-                    role: value.result
-                }
+                role: value.result
             })
         }).catch(error => {
             console.log('aaaa');
         })
     }
+    confirm = (event, id) => {
+        let userService = new UserService();
+        switch (event) {
+            case 'DELETE_USER_SUCCESS':
+                this.getUser()
+                this.setState({
+                    value: {
+                        show: true,
+                        message: 'Xóa người dùng thành công'
+                    },
+                    delete: {
+                        show: false
+                    }
+                })
+                break;
+            case 'CREATE_USER_SUCCESS':
+                this.getUser()
+                this.setState({
+                    value: {
+                        show: true,
+                        message: 'Thêm người dùng thành công'
+                    }
+                })
+                break;
+            case 'UPDATE_USER_SUCCESS':
+                this.getUser()
+                this.setState({
+                    delete: {
+                        show: false
+                    },
+                    edit: {
+                        open: false,
+                    },
+                    value: {
+                        show: true,
+                        message: 'Cập nhật người dùng thành công'
+                    }
+                })
+                break;
+            case 4:
+                userService.reset(id, '12345').then(value => {
+                    this.setState({
+                        delete: {
+                            show: false
+                        },
+                        edit: {
+                            open: false,
+                        },
+                        value: {
+                            show: true,
+                            message: 'Reset mật khẩu người dùng thành công'
+                        }
+                    })
+                }).catch(error => {
+                    console.log('aaaa');
+                })
 
+                break;
 
+        }
+    }
+    cancel = (event) => {
+        switch (event) {
+            case 0:
+                this.setState({
+                    value: {
+                        show: false
+                    }
+                })
+                break;
+            case 1:
+                this.setState({
+                    delete: {
+                        show: false
+                    }
+                })
+                break;
+            case 2:
+                this.setState({
+                    edit: {
+                        open: false
+                    }
+                })
+                break;
+            default:
+                break;
+        }
+    }
 
     render() {
         let selectedAccount = []
@@ -147,9 +299,11 @@ class TableAccount extends Component {
         let pageSizes = [4, 10, 15]
         return (
             <Paper>
+                <AlertCustom value={this.state.value} close={this.cancel} />
+                <Delete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <Grid
                     xs={12}
-                    rows={this.state.data.user}
+                    rows={this.state.user}
                     columns={selectedAccount} >
 
                     <this.ActionTypeProvider
@@ -182,15 +336,20 @@ class TableAccount extends Component {
                     <TableColumnVisibility
                     />
                     <Toolbar />
-                    <ToolbarPanel data={this.state.data} panel={this.props.panel} reload={() => {
-                        if (this.state.reload === 0)
-                            this.setState({
-                                reload: 1
+                    <ToolbarPanel user={this.state.user} role={this.state.role}
+                        panel={this.props.panel} reload={() => {
+                            if (this.state.reload === 0)
+                                this.setState({
+                                    reload: 1
+                                })
+                            else this.setState({
+                                reload: 0
                             })
-                        else this.setState({
-                            reload: 0
-                        })
-                    }} />
+                        }}
+                        addItem={this.confirm}
+                        edit={this.state.edit}
+                        cancel={this.cancel}
+                    />
 
                     <PagingPanel
                         pageSizes={pageSizes}
