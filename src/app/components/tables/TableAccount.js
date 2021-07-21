@@ -16,7 +16,7 @@ import React, { Component } from 'react';
 import Condition from '../../models/Condition';
 import UserService from '../../services/UserService';
 import RoleService from '../../services/RoleService';
-import { Delete, AlertCustom } from '../dialog/DialogAccount'
+import { Init, Delete, AlertCustom } from '../dialog/DialogAccount'
 class TableAccount extends Component {
     state = {
         user: [],
@@ -299,6 +299,7 @@ class TableAccount extends Component {
         let pageSizes = [4, 10, 15]
         return (
             <Paper>
+                <Init />
                 <AlertCustom value={this.state.value} close={this.cancel} />
                 <Delete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <Grid
@@ -337,7 +338,7 @@ class TableAccount extends Component {
                     />
                     <Toolbar />
                     <ToolbarPanel user={this.state.user} role={this.state.role}
-                        panel={this.props.panel} reload={() => {
+                        panel={'account'} reload={() => {
                             if (this.state.reload === 0)
                                 this.setState({
                                     reload: 1

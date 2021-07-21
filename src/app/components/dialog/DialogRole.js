@@ -1,121 +1,141 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-    Snackbar, Checkbox, GridList, GridListTile,
-    AppBar, Button, Tab, Tabs, DialogActions, DialogContent, Input, Slider,
-    DialogContentText, DialogTitle, Dialog, Paper, Grid as MGrid, MenuItem, Select, TextField
+    Checkbox, GridList, GridListTile, Button, DialogActions,
+    DialogContent, Input, Slider, DialogTitle, Dialog, Grid
 } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
 import RoleService from '../../services/RoleService'
 import Condition from '../../models/Condition'
 import { faAllergies } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { set } from 'date-fns';
+import PermissionService from '../../services/PermissionService';
+let roleService = new RoleService()
+let permissionService = new PermissionService()
+let pages = [1, 10, "id", 0]
+let conditions = []
+let condition = new Condition(pages, conditions)
+let permission = []
 
-function DialogRole(event) {
-    let roleService = new RoleService();
-    let pages = [1, 10, "id", 0]
-    let conditions = []
-    let condition = new Condition(pages, conditions)
-    const [permission, setPermission] = useState([])
-    const [checked, setChecked] = useState(0)
-    const [all, setAll] = useState(false)
-    const [status, setStatus] = useState(false)
-    if (event.open.open === true && status === false) {
-        let count = 0
-        setPermission(
-            event.data.map(e => {
-                if (event.open.permission.some(element =>
-                    element.id === e.id
-                )) {
-                    count += 1
-                    return {
-                        id: e.id,
-                        code: e.code,
-                        name: e.name,
-                        checked: true
-                    }
-                }
+
+
+function Init() {
+    useEffect(() => {
+        // roleService.search(condition).then(value => {
+        //     role = value.result
+        // })
+        permissionService.search(condition).then(value => {
+            permission = value.result.map(e => {
                 return {
                     id: e.id,
                     code: e.code,
                     name: e.name,
+                    status: e.status,
+                    checked: false
+                }
+            })
+
+        })
+    }, [])
+    return null
+}
+function DialogCreateRole(event) {
+    let [role, setRole] = useState([])
+    let [permissionRole, setPermissionRole] = useState([])
+    let [totalCheck, setTotalCheck] = useState(0)
+    let [all, setAll] = useState(false)
+    let code = ''
+    let name = ''
+
+    useEffect(() => {
+        roleService.search(condition).then(value => {
+            setRole(value.result)
+        })
+        permissionService.search(condition).then(value => {
+            setPermissionRole(value.result.map(e => {
+                return {
+                    id: e.id,
+                    code: e.code,
+                    name: e.name,
+                    status: e.status,
                     checked: false
                 }
             }))
-        if (count < event.data.length) setAll(false)
-        setChecked(count)
-        setStatus(true)
-    }
-    let clickDetail = (event) => {
+            setTotalCheck(0)
+        })
+
+    }, [])
+    let chossePermission = (event) => {
         if (event.target.id === 'all') {
-            setChecked(permission.length)
+            setPermissionRole(permissionRole.map(e => {
+                return {
+                    id: e.id,
+                    code: e.code,
+                    name: e.name,
+                    status: e.status,
+                    checked: true
+                }
+            }))
             setAll(true)
-            setPermission(
-                permission.map(e => {
-                    return {
-                        id: e.id,
-                        code: e.code,
-                        name: e.name,
-                        checked: true
-                    }
-                })
-            )
+            setTotalCheck(permissionRole.length)
         } else {
             if (event.target.checked === true) {
-                if (checked === permission.length - 1)
+                if (totalCheck === permission.length - 1)
                     setAll(true)
-                setChecked(checked + 1)
-                setPermission(
-                    permission.map(e => {
+                setTotalCheck(totalCheck + 1)
+                setPermissionRole(
+                    permissionRole.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
                                 code: e.code,
                                 name: e.name,
+                                status: e.status,
                                 checked: true
                             }
                         return e
-                    })
-                )
-            }
-            else {
-                if (checked <= permission.length)
-                    setAll(false)
-                setChecked(checked - 1)
-                setPermission(
-                    permission.map(e => {
+                    }))
+            } else {
+                setAll(false)
+                setTotalCheck(totalCheck - 1)
+                setPermissionRole(
+                    permissionRole.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
                                 code: e.code,
                                 name: e.name,
+                                status: e.status,
                                 checked: false
                             }
                         return e
-                    })
-                )
+                    }))
             }
         }
-
+    }
+    let changeCode = e => {
+        code = e.target.value
+    }
+    let changeName = e => {
+        name = e.target.value
     }
     let cancel = () => {
-        setStatus(false)
         event.cancel(0)
     }
     let confirm = () => {
-
         let roleRequest = {
-            code: document.getElementById('code').value,
-            name: document.getElementById('name').value,
+            code: code,
+            name: name,
             permission: permission.reduce((result, e) => {
                 if (e.checked === true) result.push(e.id)
                 return result
             }, [])
         }
-        setStatus(false)
-        event.confirm(0, event.open.id, roleRequest)
+        roleService.create(roleRequest).then(value => {
+            event.confirm(0, event.open.id, roleRequest)
+        }).catch(error => {
+            console.log('aaaa');
+        })
+        // setStatus(false)
 
-       
     }
     return (
         <Dialog
@@ -125,37 +145,36 @@ function DialogRole(event) {
         >
             <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.open.title}</DialogTitle>
             <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
-                <MGrid container spacing={3}>
-                    <MGrid item xs={4}>
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
                         <div>Mã</div>
-                        <Input id='code' name="code" title='Mã' defaultValue={event.open.code}></Input>
-                    </MGrid>
-                    <MGrid item xs={4}>
+                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={event.open.code}></Input>
+                    </Grid>
+                    <Grid item xs={4}>
                         <div>Tên</div>
-                        <Input id='name' name="name" title='Tên' defaultValue={event.open.name}></Input>
-                    </MGrid>
-                    <MGrid item xs={4}>
-                    </MGrid>
-                    <MGrid item xs={12}>
+                        <Input onChange={changeName} name="name" title='Tên' defaultValue={event.open.name}></Input>
+                    </Grid>
+                    <Grid item xs={4}>
+                    </Grid>
+                    <Grid item xs={12}>
                         <div style={{ textAlign: 'center' }}>Quyền hạn</div>
                         <div style={{ 'background-color': 'white', 'color': 'black' }}>
                             <button id='all'
                                 disabled={all}
                                 type="button" className="btn btn-success mt-1 mb-1"
-                                onClick={clickDetail}
+                                onClick={chossePermission}
                             >
                                 <FontAwesomeIcon icon={faAllergies} className='mr-2' />
                                     Chọn tất</button>
-                            <div >Có {checked}/{permission.length} loại được chọn</div>
+                            <div >Có {totalCheck}/{permissionRole.length} loại được chọn</div>
                             <GridList
-                                // cellHeight={50} 
                                 cols={6} >
-                                {permission.map(e => {
+                                {permissionRole.map(e => {
                                     return <GridListTile key={e.code}>
                                         <div >
                                             <Checkbox id={e.code}
                                                 checked={e.checked}
-                                                onClick={clickDetail}
+                                                onClick={chossePermission}
                                             />
                                             {e.name}
                                         </div>
@@ -163,8 +182,205 @@ function DialogRole(event) {
                                 })}
                             </GridList>
                         </div>
-                    </MGrid>
-                </MGrid>
+                    </Grid>
+                </Grid>
+            </DialogContent>
+            <DialogActions>
+                <Button autoFocus onClick={cancel} color="primary">Hủy</Button>
+                <Button onClick={confirm} color="primary">Xác nhận</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+function DialogEditRole(event) {
+    let [editRole, setEditRole] = useState({})
+    let [permissionRole, setPermissionRole] = useState([])
+    let [totalCheck, setTotalCheck] = useState(0)
+    let [all, setAll] = useState(false)
+    let code = ''
+    let name = ''
+    let [open, setOpen] = useState(false)
+    useEffect(() => {
+        let init = async () => {
+            let a = await (roleService.findById(event.data.id))
+            let b = await (permissionService.search(condition))
+            setEditRole(a.result)
+            setPermissionRole(b.result.map(e => {
+                if (e.id === event.data.id) {
+                    totalCheck += 1
+                    return {
+                        id: e.id,
+                        code: e.code,
+                        name: e.name,
+                        status: e.status,
+                        checked: true
+                    }
+                }
+                return {
+                    id: e.id,
+                    code: e.code,
+                    name: e.name,
+                    status: e.status,
+                    checked: false
+                }
+            }))
+            setTotalCheck(totalCheck)
+            setOpen(event.data.open)
+        }
+        init()
+        // roleService.findById(event.data.id).then(value => {
+        //     setEditRole(value.result)
+        // }).catch(error => {
+        //     return []
+        // }).finally(() => {
+        //     setTotalCheck(totalCheck)
+        //     setOpen(event.data.open)
+        // })
+        // permissionService.search(condition).then(value => {
+        //     setPermissionRole(value.result.map(e => {
+        //         if (e.id === event.data.id) {
+        //             totalCheck += 1
+        //             return {
+        //                 id: e.id,
+        //                 code: e.code,
+        //                 name: e.name,
+        //                 status: e.status,
+        //                 checked: true
+        //             }
+        //         }
+        //         return {
+        //             id: e.id,
+        //             code: e.code,
+        //             name: e.name,
+        //             status: e.status,
+        //             checked: false
+        //         }
+        //     }))
+
+        // })
+    }, [event.data.open, open])
+    let chossePermission = (event) => {
+        if (event.target.id === 'all') {
+            permissionRole = permissionRole.map(e => {
+                return {
+                    id: e.id,
+                    code: e.code,
+                    name: e.name,
+                    status: e.status,
+                    checked: true
+                }
+            })
+            all = true
+            totalCheck = permissionRole.length
+        } else {
+            if (event.target.checked === true) {
+                if (totalCheck === permission.length - 1)
+                    all = true
+                totalCheck = totalCheck + 1
+                permissionRole =
+                    permissionRole.map(e => {
+                        if (e.code === event.target.id)
+                            return {
+                                id: e.id,
+                                code: e.code,
+                                name: e.name,
+                                status: e.status,
+                                checked: true
+                            }
+                        return e
+                    })
+            } else {
+                all = false
+                totalCheck = totalCheck - 1
+                permissionRole =
+                    permissionRole.map(e => {
+                        if (e.code === event.target.id)
+                            return {
+                                id: e.id,
+                                code: e.code,
+                                name: e.name,
+                                status: e.status,
+                                checked: false
+                            }
+                        return e
+                    })
+            }
+        }
+    }
+    let changeCode = e => {
+        code = e.target.value
+    }
+    let changeName = e => {
+        name = e.target.value
+    }
+    let cancel = () => {
+        event.cancel(0)
+    }
+    let confirm = () => {
+        let roleRequest = {
+            code: code,
+            name: name,
+            permission: permission.reduce((result, e) => {
+                if (e.checked === true) result.push(e.id)
+                return result
+            }, [])
+        }
+        roleService.create(roleRequest).then(value => {
+            event.confirm(0, event.open.id, roleRequest)
+        }).catch(error => {
+            console.log('aaaa');
+        })
+        // setStatus(false)
+
+    }
+    return (
+        <Dialog
+            maxWidth='none'
+            open={open}
+            onClose={cancel}
+        >
+            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.data.title}</DialogTitle>
+            <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
+                        <div>Mã</div>
+                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={editRole.code}></Input>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Tên</div>
+                        <Input onChange={changeName} name="name" title='Tên' defaultValue={editRole.name}></Input>
+                    </Grid>
+                    <Grid item xs={4}>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <div style={{ textAlign: 'center' }}>Quyền hạn</div>
+                        <div style={{ 'background-color': 'white', 'color': 'black' }}>
+                            <button id='all'
+                                disabled={all}
+                                type="button" className="btn btn-success mt-1 mb-1"
+                                onClick={chossePermission}
+                            >
+                                <FontAwesomeIcon icon={faAllergies} className='mr-2' />
+                                    Chọn tất</button>
+                            <div >Có {totalCheck}/{permissionRole.length} loại được chọn</div>
+                            <GridList
+                                cols={6} >
+                                {permissionRole.map(e => {
+                                    return <GridListTile key={e.code}>
+                                        <div >
+                                            <Checkbox id={e.code}
+                                                checked={e.checked}
+                                                onClick={chossePermission}
+                                            />
+                                            {e.name}
+                                        </div>
+                                    </GridListTile>
+                                })}
+                            </GridList>
+                        </div>
+                    </Grid>
+                </Grid>
             </DialogContent>
             <DialogActions>
                 <Button autoFocus onClick={cancel} color="primary">Hủy</Button>
@@ -175,5 +391,5 @@ function DialogRole(event) {
 }
 
 export {
-    DialogRole,
+    Init, DialogCreateRole, DialogEditRole
 }

@@ -9,28 +9,33 @@ import UserService from '../../services/UserService';
 import Condition from '../../models/Condition';
 let userService = new UserService();
 let roleService = new RoleService();
-const [pageSize, setPageSize] = useState(10);
-    let pages = [1, pageSize, "id", 0]
-    let conditions = []
-    let condition = new Condition(pages, conditions)
-useEffect(() => {
-    userService.search(condition).then(value => {
-        setUserParent(value.result)
-    })
-    roleService.search(condition).then(value => {
-        setRole(value.result)
-    })
-}, [])
+let user = []
+let role = []
+let userParent = []
+let pageSize = 10
+let pages = [1, pageSize, "id", 0]
+let conditions = []
+let condition = new Condition(pages, conditions)
+let status = [
+    { id: 0, name: 'Đang chờ' },
+    { id: 1, name: 'Đang khóa' },
+    { id: 2, name: 'Đã kích hoạt' }
+]
+function Init() {
+    useEffect(() => {
+        userService.search(condition).then(value => {
+            user = value.result
+        })
+        roleService.search(condition).then(value => {
+            role = value.result
+        })
+        userService.searchNot(0, pages).then(value => {
+            userParent = value.result
+        })
+    }, [])
+    return null
+}
 function DialogCreateAccount(event) {
-    
-    const [userParent, setUserParent] = useState([]);
-    const [role, setRole] = useState([]);
-    const [status, setStatus] = useState([
-        { id: 0, name: 'Đang chờ' },
-        { id: 1, name: 'Đang khóa' },
-        { id: 2, name: 'Đã kích hoạt' }
-    ]);
-    
     let id = 0
     let username = ''
     let name = ''
@@ -52,14 +57,9 @@ function DialogCreateAccount(event) {
         }
         userService.create(userRequest).then(value => {
             event.confirm('CREATE_USER_SUCCESS')
-        }).then(value => {
-            userService.search(condition).then(value => {
-                setUserParent(value.result)
-            })
+        }).catch(error => {
+            event.fail(1)
         })
-            .catch(error => {
-                event.fail(1)
-            })
     }
     let cancel = () => {
         event.cancel(1)
@@ -140,7 +140,7 @@ function DialogCreateAccount(event) {
                         <div>Quản lý trực tiếp</div>
                         <Autocomplete
                             onChange={changeParent}
-                            options={userParent}
+                            options={user}
                             getOptionLabel={option => {
                                 return option.id + '-' + option.name + '-' + option.email
                             }}
@@ -167,28 +167,8 @@ function DialogEditAccount(event) {
             return {}
         return array.filter(e => e.id === id)[0]
     }
-    let userService = new UserService();
-    let roleService = new RoleService();
-    const [pageSize, setPageSize] = useState(10);
-    let pages = [1, pageSize, "id", 0]
-    let conditions = []
-    let condition = new Condition(pages, conditions)
-    const [userParent, setUserParent] = useState([]);
-    const [role, setRole] = useState([]);
-    const [status, setStatus] = useState([
-        { id: 0, name: 'Đang chờ' },
-        { id: 1, name: 'Đang khóa' },
-        { id: 2, name: 'Đã kích hoạt' }
-    ]);
-    useEffect(() => {
-        userService.search(condition).then(value => {
-            setUserParent(value.result)
-        })
-        roleService.search(condition).then(value => {
-            setRole(value.result)
-        })
-    }, [])
-    let id = event.edit.id
+
+    let id = event.edit.id != undefined ? event.edit.id : 0
     let username = event.edit.username
     let name = event.edit.name
     let email = event.edit.email
@@ -196,6 +176,11 @@ function DialogEditAccount(event) {
     let roleId = event.edit.roleId
     let statusId = event.edit.status
     let parentId = event.edit.parentId
+    if (event.edit.open === true)
+        userService.searchNot(id, pages).then(value => {
+            userParent = value.result
+        })
+
     let confirm = () => {
         let userRequest = {
             username: username,
@@ -390,4 +375,4 @@ function AlertCustom(event) {
         </Alert>
     </Snackbar>)
 }
-export { DialogCreateAccount, DialogEditAccount, Delete, AlertCustom }
+export { Init, DialogCreateAccount, DialogEditAccount, Delete, AlertCustom }

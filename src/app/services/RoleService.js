@@ -15,6 +15,20 @@ export default class RoleService {
                 return Promise.reject(error);
             })
     }
+    findById(id) {
+        return AxiosClient.get('/role/' + id, {
+            headers: {
+                Authorization: 'Bearer ' + new CookieService().read('token')
+            }
+        })
+            .then(function (response) {
+                return response;
+            })
+            .catch(function (error) {
+                console.log(error);
+                return Promise.reject(error);
+            })
+    }
     find(condition) {
         return AxiosClient.post('/role/find', condition, {
             headers: {

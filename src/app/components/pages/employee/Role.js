@@ -3,22 +3,18 @@ import PermissionService from '../../../services/PermissionService'
 import RoleService from '../../../services/RoleService'
 import Condition from '../../../models/Condition'
 import { connect } from 'react-redux'
-import { action } from '../../../redux/actions/actions'
 import { Button, Paper } from '@material-ui/core';
-import { faPencilAlt, faTrashAlt, faPlusSquare, faMinusSquare } from '@fortawesome/fontawesome-free-solid'
+import { faPencilAlt, faTrashAlt, faPlusSquare } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    TableTreeColumn, Grid, TableFixedColumns,
-    PagingPanel, Table, TableHeaderRow, Toolbar,
+    TableTreeColumn, Grid, TableFixedColumns, PagingPanel, Table, TableHeaderRow,
 } from '@devexpress/dx-react-grid-material-ui'
 
 import {
-    DataTypeProvider, PagingState, IntegratedPaging,
-    TreeDataState,
-    CustomTreeData,
+    DataTypeProvider, PagingState, IntegratedPaging, TreeDataState, CustomTreeData,
 } from '@devexpress/dx-react-grid';
 import { DialogPermission, Delete, AlertCustom } from '../../dialog/DialogPermission'
-import { DialogRole } from '../../dialog/DialogRole'
+import { Init, DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
 class Role extends Component {
 
     state = {
@@ -40,6 +36,11 @@ class Role extends Component {
             name: 0,
             title: '',
             permission: []
+        },
+        openEditRole: {
+            open: false,
+            title: 'Chỉnh sửa',
+            id: 0
         },
         delete: {
             show: false,
@@ -100,7 +101,6 @@ class Role extends Component {
                         break;
                 }
                 break;
-
             default:
                 break;
         }
@@ -110,7 +110,7 @@ class Role extends Component {
         let remove
         switch (table[1]) {
             case 'permission':
-                remove = this.state.permission.filter(e => e.code === table[2])[0]
+                remove = this.state.permission.filter(e => e.id === parseInt(table[2]))[0]
                 this.setState({
                     openPermission: {
                         open: true,
@@ -123,15 +123,11 @@ class Role extends Component {
                 })
                 break;
             case 'role':
-                remove = this.state.role.filter(e => e.code === table[2])[0]
                 this.setState({
-                    openRole: {
+                    openEditRole: {
                         open: true,
                         title: 'Chỉnh sửa',
-                        code: remove.code,
-                        id: remove.id,
-                        name: remove.name,
-                        permission: remove.items
+                        id: parseInt(table[2])
                     },
                 })
                 break;
@@ -178,12 +174,12 @@ class Role extends Component {
                     <div>
                         <button
                             onClick={this.clickEdit}
-                            id={'edit&role&' + value.row.code}
+                            id={'edit&role&' + value.row.id}
                             style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                             <FontAwesomeIcon icon={faPencilAlt} />
                         </button>
                         <button
-                            id={'trash&role&parent&' + value.row.code}
+                            id={'trash&role&parent&' + value.row.id}
                             onClick={this.clickTrash}
                             style={{ background: '#fc424a', color: 'white' }} className="btn btn-rounded btn-icon">
                             <FontAwesomeIcon icon={faTrashAlt} />
@@ -213,14 +209,14 @@ class Role extends Component {
         return (
             <div>
                 <button
-                    id={'trash&permission&' + value.row.code}
+                    id={'trash&permission&' + value.row.id}
                     onClick={this.clickTrash}
                     style={{ background: '#fc424a', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
                 <button
                     onClick={this.clickEdit}
-                    id={'edit&permission&' + value.row.code}
+                    id={'edit&permission&' + value.row.id}
                     style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPencilAlt} />
                 </button>
@@ -267,14 +263,12 @@ class Role extends Component {
                                 parent: e.id
                             }
                         })
-
                     }
                 })
             })
         }).catch(error => {
             console.log('aaaa');
         })
-
     }
     cancelAlert = (e) => {
         this.setState({
@@ -340,22 +334,16 @@ class Role extends Component {
                 let roleService = new RoleService();
                 switch (action) {
                     case 0:
-                        roleService.create(roleRequest).then(value => {
-                            this.setState({
-                                alertCustome: {
-                                    show: true,
-                                    message: 'Tạo thành công vai trò'
-                                }
-                            })
-                            this.getRole()
-                        }).catch(error => {
-                            this.fail(0)
-                        })
                         this.setState({
+                            alertCustome: {
+                                show: true,
+                                message: 'Tạo thành công vai trò'
+                            },
                             openRole: {
                                 open: false
                             }
                         })
+                        this.getRole()
                         break;
                     default:
                         roleService.update(action, roleRequest).then(value => {
@@ -427,7 +415,10 @@ class Role extends Component {
         switch (e) {
             case 0:
                 this.setState({
-                    openRole: false
+                    openEditRole: {
+                        open: false,
+                        id: 0
+                    }
                 })
                 break;
             case 1:
@@ -581,13 +572,13 @@ class Role extends Component {
         let rightColumns = ['action']
         return (
             <div className='row'>
+                <Init />
                 <Delete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <AlertCustom value={this.state.alertCustome} close={this.cancelAlert} />
                 <Paper className='col-4' >
                     <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}` }}>Vai trò</div>
                     <div>
-                        <Button
-                            id='role'
+                        <Button id='role'
                             style={{
                                 textAlign: 'text-top', background: '#00d25b', height: '2rem',
                                 color: 'white', textTransform: 'none', width: '7rem'
@@ -596,40 +587,26 @@ class Role extends Component {
                             <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
                                Thêm mới
                             </Button>
-                        <DialogRole fail={this.fail} open={this.state.openRole} cancel={this.cancel} confirm={this.confirm}
+                        <DialogCreateRole fail={this.fail} open={this.state.openRole} cancel={this.cancel} confirm={this.confirm}
                             data={this.state.permission} />
+                        <DialogEditRole fail={this.fail} data={this.state.openEditRole} cancel={this.cancel} confirm={this.confirm} />
                     </div>
-                    <Grid
-                        rows={this.state.role}
-                        columns={columns}
-                    >
-                        <this.ActionRoleTypeProvider
-                            for={['name', 'action']}
-                        />
+                    <Grid rows={this.state.role}
+                        columns={columns}>
+                        <this.ActionRoleTypeProvider for={['name', 'action']} />
                         <TreeDataState />
-                        <CustomTreeData
-                            getChildRows={this.getChildRows}
-                        />
-                        <Table
-                            columnExtensions={tableColumnExtensions}
-                        />
-                        <TableTreeColumn
-                            for="name"
-                        />
+                        <CustomTreeData getChildRows={this.getChildRows} />
+                        <Table columnExtensions={tableColumnExtensions} />
+                        <TableTreeColumn for="name" />
                         <TableFixedColumns
                             // leftColumns={leftColumns}
-                            rightColumns={rightColumns}
-                        />
-                        <PagingState
-                            currentPage={currentPage}
+                            rightColumns={rightColumns} />
+                        <PagingState currentPage={currentPage}
                             onCurrentPageChange={setCurrentPage}
                             pageSize={pageSize}
-                            onPageSizeChange={setPageSize}
-                        />
+                            onPageSizeChange={setPageSize} />
                         <IntegratedPaging />
-                        <PagingPanel
-                            pageSizes={pageSizes}
-                        />
+                        <PagingPanel pageSizes={pageSizes} />
                     </Grid>
                 </Paper>
                 <Paper className='col-8' style={{ borderLeft: 'solid 1px', borderColor: '#c1c1c1' }}>
@@ -668,7 +645,7 @@ class Role extends Component {
                             onPageSizeChange={setPageSize}
                         />
                         <IntegratedPaging />
-                        <PagingPanel pageSizes={pageSizes}/>
+                        <PagingPanel pageSizes={pageSizes} />
                     </Grid>
                 </Paper>
             </div>

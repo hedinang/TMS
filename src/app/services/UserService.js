@@ -15,6 +15,20 @@ export default class UserService {
                 return Promise.reject(error);
             })
     }
+    searchNot(id, condition) {
+        return AxiosClient.post('/user/searchNot/' + id, condition, {
+            headers: {
+                Authorization: 'Bearer ' + new CookieService().read('token')
+            }
+        })
+            .then(function (response) {
+                if (response.result === null) return { result: [] }
+                return response;
+            })
+            .catch(function (error) {
+                return Promise.reject(error);
+            })
+    }
     find(condition) {
         return AxiosClient.post('/user/find', condition, {
             headers: {

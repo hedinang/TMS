@@ -295,107 +295,13 @@ class ToolbarPanel extends React.PureComponent {
                         }} selected={this.state.selectedAccount} id={this.props.state.tabAccount} />
                     </div>
                 </div>
-
-            default:
+            case 'role':
                 return <div style={{ width: '80rem', borderStyle: 'none', }}>
                     <AppBar position="static" className='rounded-top' style={{
                         background: 'white', color: 'black',
                         borderStyle: 'none', boxShadow: 'none'
                     }}>
-                        <Tabs value={this.state.tab}
-                            TabIndicatorProps={{ style: { background: "white", } }}
-                            onChange={this.changeTabBooking} >
-                            <Tab style={{ opacity: 1, textAlign: 'center' }} label={<div>
-                                <FontAwesomeIcon icon={faEye} className='mr-2' />
-                                <span>Hiển thị</span>
-                            </div>} />
-                            <Tab id='tab' style={{ opacity: 1 }} label={<div>
-                                <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
-                                <span>Tạo mới</span>
-                                <Dialog
-                                    maxWidth='none'
-                                    open={this.props.state.dialog}
-                                    onClose={this.handleClose}
-                                >
-                                    <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
-                                        Thêm mới
-                                    </DialogTitle>
-                                    <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={4}>
-                                                <div>Chi phí</div>
-                                                <Input name="fee" title='Chi phí'
-                                                // onClick={this.changeFee}
-                                                ></Input>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <div>Loại xe</div>
-                                                <Select
-                                                    id='vehicle'
-                                                    native
-                                                    // value={state.age}
-                                                    onChange={this.changeDropDownList}
-                                                >
-                                                    <option aria-label="None" value="" />
-                                                    <option value={10}>Ten</option>
-                                                    <option value={20}>Twenty</option>
-                                                    <option value={30}>Thirty</option>
-                                                </Select>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <div>Nơi nhận</div>
-                                                <Input name="receiveAddress"></Input>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <div>Nơi gửi</div>
-                                                <Input name="sendAddress"></Input>
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <div>Loại hàng hóa</div>
-                                                <Select
-                                                    id='vehicle'
-                                                    native
-                                                    // value={state.age}
-                                                    onChange={this.changeDropDownList}
-                                                >
-                                                    <option aria-label="None" value="" />
-                                                    <option value={10}>Ten</option>
-                                                    <option value={20}>Twenty</option>
-                                                    <option value={30}>Thirty</option>
-                                                </Select>
-                                            </Grid>
-                                            <Grid>
-                                                <div>Khối lượng hàng</div>
-                                                <Slider defaultValue={0}
-                                                    onChange={this.handleSliderChange}
-                                                    marks={this.state.marks} />
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <div>Ngày</div>
-                                                <TextField
-                                                    id="datetime-local"
-                                                    label="Next appointment"
-                                                    type="datetime-local"
-                                                    defaultValue="2017-05-24T10:30"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button autoFocus onClick={this.handleClose} color="primary">
-                                            Hủy
-                                        </Button>
-                                        <Button onClick={this.handleClose} color="primary">
-                                            Xác nhận
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </div>}
-                            />
-                        </Tabs>
+                        
                     </AppBar>
                     <div id='tabPanel' style={{ display: `${this.state.display}`, borderStyle: 'none', background: 'white', }} >
                         <TabPanelBookings checked={() => {
