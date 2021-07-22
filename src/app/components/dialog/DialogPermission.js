@@ -1,36 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    Snackbar,
-    AppBar, Button, Tab, Tabs, DialogActions, DialogContent, Input, Slider,
-    DialogContentText, DialogTitle, Dialog, Paper, Grid as MGrid, MenuItem, Select, TextField
+    Snackbar, Button, DialogActions, DialogContent,
+    Input, DialogTitle, Dialog, Grid, TextField
 } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import Alert from '@material-ui/lab/Alert';
 import PermissionService from '../../services/PermissionService'
 import RoleService from '../../services/RoleService'
-function DialogPermission(event) {
+let permissionService = new PermissionService();
+function DialogCreatePermission(event) {
+    let [open, setOpen] = useState(false)
+    let [permission, setPermision] = useState({})
+    let [status, setStatus] = useState('')
+    useEffect(() => {
+        if (event.data.open === true) {
+            status = [
+                { id: 0, name: 'Đang chờ' },
+                { id: 1, name: 'Đang khóa' },
+                { id: 2, name: 'Đã kích hoạt' }
+            ]
+            setStatus(status)
+        }
+        setOpen(event.data.open)
+    }, [event.data.open])
+    let changeName = (e) => {
+        permission.name = e.target.value
+    }
+    let changeCode = (e) => {
+        permission.code = e.target.value
+    }
+    let changeStatus = (e, value) => {
+        if (value != null)
+            permission.status = value.id
+    }
     let confirm = (e) => {
-        let permissionService = new PermissionService();
-        let permissionRequest = {
-            code: document.getElementById('code').value,
-            name: document.getElementById('name').value,
-            status: parseInt(document.getElementById('status').value)
-        }
-        switch (event.open.id) {
-            case 0:
-                permissionService.create(permissionRequest).then(value => {
-                    event.confirm(1)
-                }).catch(error => {
-                    event.fail(1)
-                })
-                break;
-            default:
-                permissionService.update(event.open.id, permissionRequest).then(value => {
-                    event.confirm(1)
-                }).catch(error => {
-                    event.fail(1)
-                })
-                break;
-        }
+        permissionService.create(permission).then(value => {
+            event.confirm('CREATE_PERMISSION_SUCCESS')
+        }).catch(error => {
+            event.fail(1)
+        })
     }
     let cancel = () => {
         event.cancel(1)
@@ -38,32 +46,29 @@ function DialogPermission(event) {
     return (
         <Dialog
             maxWidth='none'
-            open={event.open.open}
-            onClose={cancel}
-        >
-            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.open.title}</DialogTitle>
+            open={open}
+            onClose={cancel}>
+            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.data.title}</DialogTitle>
             <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
-                <MGrid container spacing={3}>
-                    <MGrid item xs={4}>
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
                         <div>Mã</div>
-                        <Input id='code' name="code" title='Mã' defaultValue={event.open.code}></Input>
-                    </MGrid>
-                    <MGrid item xs={4}>
+                        <Input onChange={changeCode} name="code" title='Mã' ></Input>
+                    </Grid>
+                    <Grid item xs={4}>
                         <div>Tên</div>
-                        <Input id='name' name="name" title='Tên' defaultValue={event.open.name}></Input>
-                    </MGrid>
-                    <MGrid item xs={4}>
+                        <Input onChange={changeName} name="name" title='Tên' ></Input>
+                    </Grid>
+                    <Grid item xs={4}>
                         <div>Trạng thái</div>
-                        <Select
-                            id='status'
-                            native
-                            value={event.open.status}
-                        >
-                            <option value={0}>Đang sử dụng</option>
-                            <option value={1}>Đang tạm dừng</option>
-                        </Select>
-                    </MGrid>
-                </MGrid>
+                        <Autocomplete
+                            onChange={changeStatus}
+                            options={status}
+                            getOptionLabel={(option) => option.name}
+                            style={{ width: '13rem' }}
+                            renderInput={(params) => <TextField {...params} />} />
+                    </Grid>
+                </Grid>
             </DialogContent>
             <DialogActions>
                 <Button autoFocus onClick={cancel} color="primary">Hủy</Button>
@@ -72,7 +77,95 @@ function DialogPermission(event) {
         </Dialog>
     )
 }
-function Delete(event) {
+function DialogEditPermission(event) {
+    let getItem = (id, array) => {
+        if (id === undefined)
+            return {}
+        let a = array.filter(e => e.id === id)[0]
+        return a
+    }
+    let [open, setOpen] = useState(false)
+    let [permission, setPermision] = useState({})
+    let [status, setStatus] = useState('')
+    useEffect(() => {
+        if (event.data.open === true) {
+            permissionService.findById(event.data.id)
+                .then(value => {
+                    permission = value.result
+                })
+                .finally(() => {
+                    setPermision(permission)
+                    setStatus(status)
+                    setOpen(true)
+                })
+            status = [
+                { id: 0, name: 'Đang chờ' },
+                { id: 1, name: 'Đang khóa' },
+                { id: 2, name: 'Đã kích hoạt' }
+            ]
+            setStatus(status)
+        }
+        else
+            setOpen(false)
+    }, [event.data.open])
+
+    let changeName = (e) => {
+        permission.name = e.target.value
+    }
+    let changeCode = (e) => {
+        permission.code = e.target.value
+    }
+    let changeStatus = (e, value) => {
+        if (value != null)
+            permission.status = value.id
+    }
+    let confirm = (e) => {
+        let permissionService = new PermissionService();
+        permissionService.update(event.data.id, permission).then(value => {
+            event.confirm('UPDATE_PERMISSION_SUCCESS')
+        }).catch(error => {
+            event.fail(1)
+        })
+    }
+    let cancel = () => {
+        event.cancel('UPDATE_PERMISSION')
+    }
+    return (
+        <Dialog
+            maxWidth='none'
+            open={open}
+            onClose={cancel}>
+            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.data.title}</DialogTitle>
+            <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
+                        <div>Mã</div>
+                        <Input defaultValue={permission.code} onChange={changeCode} name="code" title='Mã' ></Input>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Tên</div>
+                        <Input defaultValue={permission.name} onChange={changeName} name="name" title='Tên' ></Input>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Trạng thái</div>
+                        <Autocomplete
+                            defaultValue={getItem(permission.status, status)}
+                            onChange={changeStatus}
+                            options={status}
+                            getOptionLabel={(option) => option.name}
+                            style={{ width: '13rem' }}
+                            renderInput={(params) => <TextField {...params} />} />
+                    </Grid>
+                </Grid>
+            </DialogContent>
+            <DialogActions>
+                <Button autoFocus onClick={cancel} color="primary">Hủy</Button>
+                <Button onClick={confirm} color="primary">Xác nhận</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+function DeletePermission(event) {
     let title = ''
     switch (event.data.table) {
         case 0:
@@ -90,7 +183,7 @@ function Delete(event) {
             break;
     }
     let cancel = (e) => {
-        event.cancel(4)
+        event.cancel('CANCEL_PERMISSION')
     }
     let confirm = (e) => {
         switch (event.data.table) {
@@ -130,7 +223,7 @@ function Delete(event) {
 
     return (
         <Dialog
-            open={event.data.show}
+            open={event.data.open}
             onClose={cancel}
         >
             <DialogTitle>Cảnh báo</DialogTitle>
@@ -154,4 +247,4 @@ function AlertCustom(event) {
         </Alert>
     </Snackbar>)
 }
-export { DialogPermission, Delete, AlertCustom }
+export { DialogCreatePermission, DialogEditPermission, DeletePermission, AlertCustom }

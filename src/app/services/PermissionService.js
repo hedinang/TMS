@@ -15,6 +15,20 @@ export default class PermissionService {
                 return Promise.reject(error);
             })
     }
+    findById(id) {
+        return AxiosClient.get('/permission/' + id, {
+            headers: {
+                Authorization: 'Bearer ' + new CookieService().read('token')
+            }
+        })
+            .then(function (response) {
+                return response;
+            })
+            .catch(function (error) {
+                console.log(error);
+                return Promise.reject(error);
+            })
+    }
     create(permissionRequest) {
         return AxiosClient.post('/permission', permissionRequest, {
             headers: {

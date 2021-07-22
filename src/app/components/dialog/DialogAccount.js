@@ -9,53 +9,45 @@ import UserService from '../../services/UserService';
 import Condition from '../../models/Condition';
 let userService = new UserService();
 let roleService = new RoleService();
-let user = []
 let role = []
-let userParent = []
 let pageSize = 10
 let pages = [1, pageSize, "id", 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
-let status = [
-    { id: 0, name: 'Đang chờ' },
-    { id: 1, name: 'Đang khóa' },
-    { id: 2, name: 'Đã kích hoạt' }
-]
-function Init() {
-    useEffect(() => {
-        userService.search(condition).then(value => {
-            user = value.result
-        })
-        roleService.search(condition).then(value => {
-            role = value.result
-        })
-        userService.searchNot(0, pages).then(value => {
-            userParent = value.result
-        })
-    }, [])
-    return null
-}
+
 function DialogCreateAccount(event) {
-    let id = 0
-    let username = ''
-    let name = ''
-    let email = ''
-    let phone = ''
-    let roleId = 0
-    let statusId = 0
-    let parentId = 0
-    let confirm = () => {
-        let userRequest = {
-            username: username,
-            password: '12345',
-            name: name,
-            email: email,
-            phone: phone,
-            role: roleId,
-            status: statusId,
-            parentId: parentId,
+    let [open, setOpen] = useState(false)
+    let [user, setUser] = useState({})
+    let [status, setStatus] = useState([])
+    let [parent, setParent] = useState([])
+    let [role, setRole] = useState([])
+    useEffect(() => {
+        if (event.create.open === true) {
+            userService.search(condition)
+                .then(value => {
+                    parent = value.result
+                    return roleService.search(condition)
+                })
+                .then(value => {
+                    role = value.result
+                })
+                .finally(() => {
+                    setParent(parent)
+                    setRole(role)
+                    setStatus(status)
+                    setOpen(true)
+                })
+            status = [
+                { id: 0, name: 'Đang chờ' },
+                { id: 1, name: 'Đang khóa' },
+                { id: 2, name: 'Đã kích hoạt' }
+            ]
         }
-        userService.create(userRequest).then(value => {
+        else
+            setOpen(false)
+    }, [event.create.open])
+    let confirm = () => {
+        userService.create(user).then(value => {
             event.confirm('CREATE_USER_SUCCESS')
         }).catch(error => {
             event.fail(1)
@@ -65,30 +57,33 @@ function DialogCreateAccount(event) {
         event.cancel(1)
     }
     let changeName = (e) => {
-        name = e.target.value
+        user.name = e.target.value
     }
     let changeUsername = (e) => {
-        username = e.target.value
+        user.username = e.target.value
     }
     let changeEmail = (e) => {
-        email = e.target.value
+        user.email = e.target.value
     }
     let changePhone = (e) => {
-        phone = e.target.value
+        user.phone = e.target.value
     }
     let changeRole = (e, value) => {
-        roleId = value.id
+        if (value != null)
+            user.role = value.id
     }
     let changeStatus = (e, value) => {
-        statusId = value.id
+        if (value != null)
+            user.status = value.id
     }
     let changeParent = (e, value) => {
-        parentId = value.id
+        if (value != null)
+            user.parentId = value.id
     }
     return (
         <Dialog
             maxWidth='none'
-            open={event.open.open}
+            open={open}
             onClose={cancel}
         >
             <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
@@ -140,7 +135,7 @@ function DialogCreateAccount(event) {
                         <div>Quản lý trực tiếp</div>
                         <Autocomplete
                             onChange={changeParent}
-                            options={user}
+                            options={parent}
                             getOptionLabel={option => {
                                 return option.id + '-' + option.name + '-' + option.email
                             }}
@@ -165,70 +160,85 @@ function DialogEditAccount(event) {
     let getItem = (id, array) => {
         if (id === undefined)
             return {}
-        return array.filter(e => e.id === id)[0]
+        let a = array.filter(e => e.id === id)[0]
+        return a
     }
-
-    let id = event.edit.id != undefined ? event.edit.id : 0
-    let username = event.edit.username
-    let name = event.edit.name
-    let email = event.edit.email
-    let phone = event.edit.phone
-    let roleId = event.edit.roleId
-    let statusId = event.edit.status
-    let parentId = event.edit.parentId
-    if (event.edit.open === true)
-        userService.searchNot(id, pages).then(value => {
-            userParent = value.result
-        })
-
-    let confirm = () => {
-        let userRequest = {
-            username: username,
-            password: '12345',
-            name: name,
-            email: email,
-            phone: phone,
-            role: roleId,
-            status: statusId,
-            parentId: parentId,
+    let [open, setOpen] = useState(false)
+    let [id, setId] = useState(0)
+    let [user, setUser] = useState({})
+    let [status, setStatus] = useState([])
+    let [parent, setParent] = useState([])
+    let [role, setRole] = useState([])
+    useEffect(() => {
+        if (event.edit.open === true) {
+            id = event.edit.id != undefined ? event.edit.id : 0
+            userService.searchNot(id, pages)
+                .then(value => {
+                    parent = value.result
+                    return roleService.search(condition)
+                })
+                .then(value => {
+                    role = value.result
+                    return userService.findById(id)
+                })
+                .then(value => {
+                    user = value.result
+                })
+                .finally(() => {
+                    setParent(parent)
+                    setRole(role)
+                    setStatus(status)
+                    setUser(user)
+                    setId(id)
+                    setOpen(true)
+                })
+            status = [
+                { id: 0, name: 'Đang chờ' },
+                { id: 1, name: 'Đang khóa' },
+                { id: 2, name: 'Đã kích hoạt' }
+            ]
         }
-        userService.update(id, userRequest).then(value => {
+        else
+            setOpen(false)
+    }, [event.edit.open])
+    let confirm = () => {
+        userService.update(id, user).then(value => {
             event.confirm('UPDATE_USER_SUCCESS')
         }).catch(error => {
             event.fail()
         })
     }
     let cancel = () => {
-        event.cancel(2)
+        event.cancel('CANCEL_USER_UPDATE')
     }
     let changeName = (e) => {
-        name = e.target.value
+        user.name = e.target.value
     }
     let changeUsername = (e) => {
-        username = e.target.value
+        user.username = e.target.value
     }
     let changeEmail = (e) => {
-        email = e.target.value
+        user.email = e.target.value
     }
     let changePhone = (e) => {
-        phone = e.target.value
+        user.phone = e.target.value
     }
     let changeRole = (e, value) => {
         if (value != null)
-            roleId = value.id
+            user.role = value.id
     }
     let changeStatus = (e, value) => {
         if (value != null)
-            statusId = value.id
+            user.status = value.id
     }
     let changeParent = (e, value) => {
         if (value != null)
-            parentId = value.id
+            user.parentId = value.id
     }
     return (
         <Dialog
             maxWidth='none'
-            open={event.edit.open}
+            open={open}
             onClose={cancel}
         >
             <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
@@ -239,31 +249,31 @@ function DialogEditAccount(event) {
                     <Grid item xs={4}>
                         <div>Họ và tên</div>
                         <Input
-                            defaultValue={event.edit.name}
+                            defaultValue={user.name}
                             name="name" title='Tên' onChange={changeName}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Tên đăng nhập</div>
                         <Input
-                            defaultValue={event.edit.username}
+                            defaultValue={user.username}
                             name="username" title='Tên' onChange={changeUsername}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Email</div>
                         <Input
-                            defaultValue={event.edit.email}
+                            defaultValue={user.email}
                             name="email" title='Email' onChange={changeEmail}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Số điện thoại</div>
                         <Input
-                            defaultValue={event.edit.phone}
+                            defaultValue={user.phone}
                             name="phone" title='Số điện thoại' onChange={changePhone}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Vai trò</div>
                         <Autocomplete
-                            defaultValue={getItem(event.edit.roleId, role)}
+                            defaultValue={getItem(user.role, role)}
                             onChange={changeRole}
                             options={role}
                             getOptionLabel={option => option.name}
@@ -274,7 +284,7 @@ function DialogEditAccount(event) {
                     <Grid item xs={4}>
                         <div>Trạng thái</div>
                         <Autocomplete
-                            defaultValue={getItem(event.edit.status, status)}
+                            defaultValue={getItem(user.status, status)}
                             onChange={changeStatus}
                             options={status}
                             getOptionLabel={(option) => option.name}
@@ -285,9 +295,9 @@ function DialogEditAccount(event) {
                     <Grid item xs={8}>
                         <div>Quản lý trực tiếp</div>
                         <Autocomplete
-                            defaultValue={getItem(event.edit.parentId, userParent)}
+                            defaultValue={getItem(user.parentId, parent)}
                             onChange={changeParent}
-                            options={userParent}
+                            options={parent}
                             getOptionLabel={option => {
                                 return option.id + '-' + option.name + '-' + option.email
                             }}
@@ -312,54 +322,6 @@ function DialogEditAccount(event) {
         </Dialog>
     )
 }
-function Delete(event) {
-    let title = ''
-    switch (event.data.action) {
-        case 'DELETE_USER':
-            title = 'Bạn có chắc chắn xóa người dùng ' + event.data.name + ' có email là ' + event.data.email + ' ?'
-            break;
-        case 4:
-            title = 'Bạn có chắc chắn reset mật khẩu người dùng ' + event.data.name + ' có email là ' + event.data.email + ' ?'
-            break;
-        default:
-            break;
-    }
-    let cancel = (e) => {
-        event.cancel(1)
-    }
-    let confirm = (e) => {
-        switch (event.data.action) {
-            case 0:
-                event.confirm(1, event.data.id)
-                break;
-            case 'DELETE_USER':
-                userService.delete(event.data.id).then(value => {
-                    event.confirm('DELETE_USER_SUCCESS', event.data.id)
-                }).catch(error => {
-                    event.fail('DELETE_USER_FAIL', event.data.id)
-                })
-                break;
-            case 4:
-                event.confirm(4, event.data.id)
-                break;
-            default:
-                break;
-        }
-    }
-    return (
-        <Dialog
-            open={event.data.show}
-            onClose={cancel}
-        >
-            <DialogTitle>Cảnh báo</DialogTitle>
-            <DialogContent >{title}</DialogContent>
-            <DialogActions>
-                <Button autoFocus onClick={cancel} color="primary">Hủy</Button>
-                <Button onClick={confirm} color="primary">Đồng ý</Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
 function AlertCustom(event) {
     let close = (e) => {
         event.close(0)
@@ -375,4 +337,4 @@ function AlertCustom(event) {
         </Alert>
     </Snackbar>)
 }
-export { Init, DialogCreateAccount, DialogEditAccount, Delete, AlertCustom }
+export { DialogCreateAccount, DialogEditAccount, AlertCustom }

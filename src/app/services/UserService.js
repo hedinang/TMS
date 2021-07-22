@@ -29,6 +29,20 @@ export default class UserService {
                 return Promise.reject(error);
             })
     }
+    findById(id) {
+        return AxiosClient.get('/user/' + id, {
+            headers: {
+                Authorization: 'Bearer ' + new CookieService().read('token')
+            }
+        })
+            .then(function (response) {
+                return response;
+            })
+            .catch(function (error) {
+                console.log(error);
+                return Promise.reject(error);
+            })
+    }
     find(condition) {
         return AxiosClient.post('/user/find', condition, {
             headers: {

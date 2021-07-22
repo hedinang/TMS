@@ -10,7 +10,7 @@ import { action } from '../../redux/actions/actions'
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import TabPanel from '../tables/TabPanelBookings';
+import TabPanel from '../tables/TabPanelBooking';
 import TabPanelDashboard from '../tables/TabPanelDashboard';
 const mapData = {
   "BZ": 75.00,

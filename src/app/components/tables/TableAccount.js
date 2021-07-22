@@ -16,7 +16,9 @@ import React, { Component } from 'react';
 import Condition from '../../models/Condition';
 import UserService from '../../services/UserService';
 import RoleService from '../../services/RoleService';
-import { Init, Delete, AlertCustom } from '../dialog/DialogAccount'
+import { AlertCustom } from '../dialog/DialogAccount'
+import { DialogDelete } from '../dialog/DialogDelete'
+
 class TableAccount extends Component {
     state = {
         user: [],
@@ -27,14 +29,14 @@ class TableAccount extends Component {
             message: ''
         },
         delete: {
-            show: false,
+            open: false,
             name: '',
             id: '',
             email: ''
         },
         edit: {
             open: false,
-
+            id: 0
         }
     }
     componentWillMount() {
@@ -46,7 +48,7 @@ class TableAccount extends Component {
         let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
         this.setState({
             delete: {
-                show: true,
+                open: true,
                 id: remove.id,
                 name: remove.name,
                 email: remove.email,
@@ -62,17 +64,6 @@ class TableAccount extends Component {
             edit: {
                 open: true,
                 id: remove.id,
-                name: remove.name,
-                email: remove.email,
-                phone: remove.phone,
-                username: remove.username,
-                roleId: remove.roleId,
-                roleName: remove.roleName,
-                status: remove.status,
-                parentName: remove.parentName,
-                parentId: remove.parentId,
-                parentName: remove.parentName,
-                action: 0
             }
         })
 
@@ -82,7 +73,7 @@ class TableAccount extends Component {
         let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
         this.setState({
             delete: {
-                show: true,
+                open: true,
                 id: remove.id,
                 name: remove.name,
                 email: remove.email,
@@ -179,7 +170,6 @@ class TableAccount extends Component {
         })
     }
     confirm = (event, id) => {
-        let userService = new UserService();
         switch (event) {
             case 'DELETE_USER_SUCCESS':
                 this.getUser()
@@ -205,11 +195,8 @@ class TableAccount extends Component {
             case 'UPDATE_USER_SUCCESS':
                 this.getUser()
                 this.setState({
-                    delete: {
-                        show: false
-                    },
                     edit: {
-                        open: false,
+                        open: false
                     },
                     value: {
                         show: true,
@@ -217,26 +204,17 @@ class TableAccount extends Component {
                     }
                 })
                 break;
-            case 4:
-                userService.reset(id, '12345').then(value => {
-                    this.setState({
-                        delete: {
-                            show: false
-                        },
-                        edit: {
-                            open: false,
-                        },
-                        value: {
-                            show: true,
-                            message: 'Reset mật khẩu người dùng thành công'
-                        }
-                    })
-                }).catch(error => {
-                    console.log('aaaa');
+            case 'RESET_USER_SUCCESS':
+                this.setState({
+                    delete: {
+                        show: false
+                    },
+                    value: {
+                        show: true,
+                        message: 'Reset mật khẩu người dùng thành công'
+                    }
                 })
-
                 break;
-
         }
     }
     cancel = (event) => {
@@ -248,14 +226,21 @@ class TableAccount extends Component {
                     }
                 })
                 break;
-            case 1:
+            case 'DELETE_USER':
                 this.setState({
                     delete: {
                         show: false
                     }
                 })
                 break;
-            case 2:
+            case 'RESET_USER':
+                this.setState({
+                    delete: {
+                        show: false
+                    }
+                })
+                break;
+            case 'CANCEL_USER_UPDATE':
                 this.setState({
                     edit: {
                         open: false
@@ -299,9 +284,9 @@ class TableAccount extends Component {
         let pageSizes = [4, 10, 15]
         return (
             <Paper>
-                <Init />
+
                 <AlertCustom value={this.state.value} close={this.cancel} />
-                <Delete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
+                <DialogDelete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <Grid
                     xs={12}
                     rows={this.state.user}
@@ -337,7 +322,8 @@ class TableAccount extends Component {
                     <TableColumnVisibility
                     />
                     <Toolbar />
-                    <ToolbarPanel user={this.state.user} role={this.state.role}
+                    <ToolbarPanel
+                        edit={this.state.edit}
                         panel={'account'} reload={() => {
                             if (this.state.reload === 0)
                                 this.setState({
@@ -348,7 +334,6 @@ class TableAccount extends Component {
                             })
                         }}
                         addItem={this.confirm}
-                        edit={this.state.edit}
                         cancel={this.cancel}
                     />
 

@@ -180,7 +180,7 @@ let initState = {
             'checked': true
         },
     ],
-    selectedBookings: [
+    selectedBooking: [
         {
             'field': 'id',
             'title': 'STT',
@@ -375,7 +375,7 @@ let initState = {
     good: 'aaa',
 
     tabDashboard: 0,
-    tabBookings: 0,
+    tabBooking: 0,
     tabAccount: 0,
     tabRole: 0,
 
@@ -383,7 +383,7 @@ let initState = {
     displayBookings: 'none',
     displayAccount: 'none',
 
-    selectStateBookings: false,
+    selectStateBooking: false,
     selectStateDashboard: false,
     selectStateAccount: false,
 
@@ -409,7 +409,7 @@ function reducer(state = initState, action) {
                 state['displayDashboard'] = action.value.display
             }
             else {
-                state['selectStateBookings'] = action.value.selectState
+                state['selectStateBooking'] = action.value.selectState
                 state['displayBookings'] = action.value.display
             }
             return state

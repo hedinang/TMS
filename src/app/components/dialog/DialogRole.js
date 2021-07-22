@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Checkbox, GridList, GridListTile, Button, DialogActions,
-    DialogContent, Input, Slider, DialogTitle, Dialog, Grid
+    DialogContent, Input, DialogTitle, Dialog, Grid
 } from '@material-ui/core';
 import RoleService from '../../services/RoleService'
 import Condition from '../../models/Condition'
@@ -13,59 +13,45 @@ let permissionService = new PermissionService()
 let pages = [1, 10, "id", 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
-let permission = []
 
 
-
-function Init() {
-    useEffect(() => {
-        // roleService.search(condition).then(value => {
-        //     role = value.result
-        // })
-        permissionService.search(condition).then(value => {
-            permission = value.result.map(e => {
-                return {
-                    id: e.id,
-                    code: e.code,
-                    name: e.name,
-                    status: e.status,
-                    checked: false
-                }
-            })
-
-        })
-    }, [])
-    return null
+function checkExist(id, array) {
+    if (array.filter(e => e.id === id).length === 0)
+        return false
+    return true
 }
+
 function DialogCreateRole(event) {
-    let [role, setRole] = useState([])
-    let [permissionRole, setPermissionRole] = useState([])
+    let [permission, setPermission] = useState([])
     let [totalCheck, setTotalCheck] = useState(0)
     let [all, setAll] = useState(false)
-    let code = ''
-    let name = ''
+    let [open, setOpen] = useState(false)
+    let [code, setCode] = useState('')
+    let [name, setName] = useState('')
 
     useEffect(() => {
-        roleService.search(condition).then(value => {
-            setRole(value.result)
-        })
-        permissionService.search(condition).then(value => {
-            setPermissionRole(value.result.map(e => {
-                return {
-                    id: e.id,
-                    code: e.code,
-                    name: e.name,
-                    status: e.status,
-                    checked: false
-                }
-            }))
+        if (event.data.open === true) {
+            permissionService.search(condition).then(value => {
+                setPermission(value.result.map(e => {
+                    return {
+                        id: e.id,
+                        code: e.code,
+                        name: e.name,
+                        status: e.status,
+                        checked: false
+                    }
+                }))
+            })
             setTotalCheck(0)
-        })
-
-    }, [])
+            setName('')
+            setCode('')
+            setAll(false)
+        }
+        setOpen(event.data.open)
+    }, [event.data.open])
     let chossePermission = (event) => {
         if (event.target.id === 'all') {
-            setPermissionRole(permissionRole.map(e => {
+            permission = permission.map(e => {
                 return {
                     id: e.id,
                     code: e.code,
@@ -73,16 +59,17 @@ function DialogCreateRole(event) {
                     status: e.status,
                     checked: true
                 }
-            }))
-            setAll(true)
-            setTotalCheck(permissionRole.length)
+            })
+            all = true
+            totalCheck = permission.length
+
         } else {
             if (event.target.checked === true) {
                 if (totalCheck === permission.length - 1)
-                    setAll(true)
-                setTotalCheck(totalCheck + 1)
-                setPermissionRole(
-                    permissionRole.map(e => {
+                    all = true
+                totalCheck = totalCheck + 1
+                permission =
+                    permission.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
@@ -92,12 +79,12 @@ function DialogCreateRole(event) {
                                 checked: true
                             }
                         return e
-                    }))
+                    })
             } else {
-                setAll(false)
-                setTotalCheck(totalCheck - 1)
-                setPermissionRole(
-                    permissionRole.map(e => {
+                all = false
+                totalCheck = totalCheck - 1
+                permission =
+                    permission.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
@@ -107,9 +94,14 @@ function DialogCreateRole(event) {
                                 checked: false
                             }
                         return e
-                    }))
+                    })
             }
         }
+        setName(name)
+        setCode(code)
+        setPermission(permission)
+        setAll(all)
+        setTotalCheck(totalCheck)
     }
     let changeCode = e => {
         code = e.target.value
@@ -118,7 +110,7 @@ function DialogCreateRole(event) {
         name = e.target.value
     }
     let cancel = () => {
-        event.cancel(0)
+        event.cancel('CREATE_ROLE')
     }
     let confirm = () => {
         let roleRequest = {
@@ -130,29 +122,26 @@ function DialogCreateRole(event) {
             }, [])
         }
         roleService.create(roleRequest).then(value => {
-            event.confirm(0, event.open.id, roleRequest)
+            event.confirm('CREATE_ROLE_SUCCESS')
         }).catch(error => {
             console.log('aaaa');
         })
-        // setStatus(false)
-
     }
     return (
         <Dialog
             maxWidth='none'
-            open={event.open.open}
-            onClose={cancel}
-        >
-            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.open.title}</DialogTitle>
+            open={open}
+            onClose={cancel}>
+            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.data.title}</DialogTitle>
             <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
                         <div>Mã</div>
-                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={event.open.code}></Input>
+                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={code}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Tên</div>
-                        <Input onChange={changeName} name="name" title='Tên' defaultValue={event.open.name}></Input>
+                        <Input onChange={changeName} name="name" title='Tên' defaultValue={name}></Input>
                     </Grid>
                     <Grid item xs={4}>
                     </Grid>
@@ -166,10 +155,10 @@ function DialogCreateRole(event) {
                             >
                                 <FontAwesomeIcon icon={faAllergies} className='mr-2' />
                                     Chọn tất</button>
-                            <div >Có {totalCheck}/{permissionRole.length} loại được chọn</div>
+                            <div >Có {totalCheck}/{permission.length} loại được chọn</div>
                             <GridList
                                 cols={6} >
-                                {permissionRole.map(e => {
+                                {permission.map(e => {
                                     return <GridListTile key={e.code}>
                                         <div >
                                             <Checkbox id={e.code}
@@ -194,75 +183,59 @@ function DialogCreateRole(event) {
 }
 
 function DialogEditRole(event) {
-    let [editRole, setEditRole] = useState({})
-    let [permissionRole, setPermissionRole] = useState([])
+    let [code, setCode] = useState('')
+    let [name, setName] = useState('')
+    let permissionRole = []
+    let [permission, setPermission] = useState([])
     let [totalCheck, setTotalCheck] = useState(0)
     let [all, setAll] = useState(false)
-    let code = ''
-    let name = ''
     let [open, setOpen] = useState(false)
     useEffect(() => {
-        let init = async () => {
-            let a = await (roleService.findById(event.data.id))
-            let b = await (permissionService.search(condition))
-            setEditRole(a.result)
-            setPermissionRole(b.result.map(e => {
-                if (e.id === event.data.id) {
-                    totalCheck += 1
+        if (event.data.open === false)
+            setOpen(false)
+        else
+            roleService.findById(event.data.id).then(value => {
+                code = value.result.code
+                name = value.result.name
+                totalCheck = 0
+                if (value.result.permission !== null)
+                    permissionRole = value.result.permission
+                return permissionService.search(condition)
+            }).then(value => {
+                permission = value.result.map(e => {
+                    if (checkExist(e.id, permissionRole)) {
+                        totalCheck += 1
+                        return {
+                            id: e.id,
+                            code: e.code,
+                            name: e.name,
+                            status: e.status,
+                            checked: true
+                        }
+                    }
                     return {
                         id: e.id,
                         code: e.code,
                         name: e.name,
                         status: e.status,
-                        checked: true
+                        checked: false
                     }
-                }
-                return {
-                    id: e.id,
-                    code: e.code,
-                    name: e.name,
-                    status: e.status,
-                    checked: false
-                }
-            }))
-            setTotalCheck(totalCheck)
-            setOpen(event.data.open)
-        }
-        init()
-        // roleService.findById(event.data.id).then(value => {
-        //     setEditRole(value.result)
-        // }).catch(error => {
-        //     return []
-        // }).finally(() => {
-        //     setTotalCheck(totalCheck)
-        //     setOpen(event.data.open)
-        // })
-        // permissionService.search(condition).then(value => {
-        //     setPermissionRole(value.result.map(e => {
-        //         if (e.id === event.data.id) {
-        //             totalCheck += 1
-        //             return {
-        //                 id: e.id,
-        //                 code: e.code,
-        //                 name: e.name,
-        //                 status: e.status,
-        //                 checked: true
-        //             }
-        //         }
-        //         return {
-        //             id: e.id,
-        //             code: e.code,
-        //             name: e.name,
-        //             status: e.status,
-        //             checked: false
-        //         }
-        //     }))
-
-        // })
-    }, [event.data.open, open])
+                })
+                all = totalCheck === permission.length ? true : false
+                setPermission(permission)
+                setTotalCheck(totalCheck)
+                setAll(all)
+                setCode(code)
+                setName(name)
+            }).catch(error => {
+                return []
+            }).finally(() => {
+                setOpen(true)
+            })
+    }, [event.data.open])
     let chossePermission = (event) => {
         if (event.target.id === 'all') {
-            permissionRole = permissionRole.map(e => {
+            permission = permission.map(e => {
                 return {
                     id: e.id,
                     code: e.code,
@@ -272,14 +245,14 @@ function DialogEditRole(event) {
                 }
             })
             all = true
-            totalCheck = permissionRole.length
+            totalCheck = permission.length
         } else {
             if (event.target.checked === true) {
                 if (totalCheck === permission.length - 1)
                     all = true
                 totalCheck = totalCheck + 1
-                permissionRole =
-                    permissionRole.map(e => {
+                permission =
+                    permission.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
@@ -293,8 +266,8 @@ function DialogEditRole(event) {
             } else {
                 all = false
                 totalCheck = totalCheck - 1
-                permissionRole =
-                    permissionRole.map(e => {
+                permission =
+                    permission.map(e => {
                         if (e.code === event.target.id)
                             return {
                                 id: e.id,
@@ -307,6 +280,9 @@ function DialogEditRole(event) {
                     })
             }
         }
+        setPermission(permission)
+        setAll(all)
+        setTotalCheck(totalCheck)
     }
     let changeCode = e => {
         code = e.target.value
@@ -315,7 +291,7 @@ function DialogEditRole(event) {
         name = e.target.value
     }
     let cancel = () => {
-        event.cancel(0)
+        event.cancel('UPDATE_ROLE')
     }
     let confirm = () => {
         let roleRequest = {
@@ -326,30 +302,26 @@ function DialogEditRole(event) {
                 return result
             }, [])
         }
-        roleService.create(roleRequest).then(value => {
-            event.confirm(0, event.open.id, roleRequest)
+        roleService.update(event.data.id, roleRequest).then(value => {
+            event.confirm('UPDATE_ROLE_SUCCESS')
         }).catch(error => {
-            console.log('aaaa');
+            event.fail('UPDATE_ROLE_FAIL')
         })
-        // setStatus(false)
-
     }
     return (
-        <Dialog
-            maxWidth='none'
+        <Dialog maxWidth='none'
             open={open}
-            onClose={cancel}
-        >
+            onClose={cancel}>
             <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">{event.data.title}</DialogTitle>
             <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
                         <div>Mã</div>
-                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={editRole.code}></Input>
+                        <Input onChange={changeCode} name="code" title='Mã' defaultValue={code}></Input>
                     </Grid>
                     <Grid item xs={4}>
                         <div>Tên</div>
-                        <Input onChange={changeName} name="name" title='Tên' defaultValue={editRole.name}></Input>
+                        <Input onChange={changeName} name="name" title='Tên' defaultValue={name}></Input>
                     </Grid>
                     <Grid item xs={4}>
                     </Grid>
@@ -363,10 +335,10 @@ function DialogEditRole(event) {
                             >
                                 <FontAwesomeIcon icon={faAllergies} className='mr-2' />
                                     Chọn tất</button>
-                            <div >Có {totalCheck}/{permissionRole.length} loại được chọn</div>
+                            <div >Có {totalCheck}/{permission.length} loại được chọn</div>
                             <GridList
                                 cols={6} >
-                                {permissionRole.map(e => {
+                                {permission.map(e => {
                                     return <GridListTile key={e.code}>
                                         <div >
                                             <Checkbox id={e.code}
@@ -389,7 +361,6 @@ function DialogEditRole(event) {
         </Dialog>
     )
 }
-
 export {
-    Init, DialogCreateRole, DialogEditRole
+    DialogCreateRole, DialogEditRole
 }

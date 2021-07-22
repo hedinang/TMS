@@ -13,8 +13,9 @@ import {
 import {
     DataTypeProvider, PagingState, IntegratedPaging, TreeDataState, CustomTreeData,
 } from '@devexpress/dx-react-grid';
-import { DialogPermission, Delete, AlertCustom } from '../../dialog/DialogPermission'
-import { Init, DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
+import { DialogCreatePermission, DialogEditPermission, AlertCustom } from '../../dialog/DialogPermission'
+import { DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
+import { DialogDelete } from '../../dialog/DialogDelete'
 class Role extends Component {
 
     state = {
@@ -24,18 +25,17 @@ class Role extends Component {
         textColor: 'black',
         permission: [],
         role: [],
-        openPermission: {
+        openCreatePermission: {
             open: false,
-            status: false,
-            name: 1,
             title: ''
         },
-        openRole: {
+        openEditPermission: {
             open: false,
-            status: false,
-            name: 0,
-            title: '',
-            permission: []
+            title: ''
+        },
+        openCreateRole: {
+            open: false,
+            title: 'Tạo mới',
         },
         openEditRole: {
             open: false,
@@ -43,10 +43,11 @@ class Role extends Component {
             id: 0
         },
         delete: {
-            show: false,
+            open: false,
             id: 0,
             table: 10,
-            code: ''
+            code: '',
+            action: ''
         },
         alertCustome: {
             show: false,
@@ -59,27 +60,27 @@ class Role extends Component {
         let remove
         switch (table[1]) {
             case 'permission':
-                remove = this.state.permission.filter(e => e.code === table[2])[0]
+                remove = this.state.permission.filter(e => e.id === parseInt(table[2]))[0]
                 this.setState({
                     delete: {
                         show: true,
                         id: remove.id,
-                        table: 1,
-                        code: remove.code
+                        code: remove.code,
+                        action: 'DELETE_PERMISSION'
                     }
                 })
                 break;
             case 'role':
                 switch (table[2]) {
                     case 'parent':
-                        remove = this.state.role.filter(e => e.code === table[3])[0]
+                        remove = this.state.role.filter(e => e.id === parseInt(table[3]))[0]
                         this.setState({
                             delete: {
-                                show: true,
+                                open: true,
                                 parentId: remove.id,
                                 childrenId: 0,
-                                table: 0,
-                                parentCode: remove.code
+                                parentCode: remove.code,
+                                action: 'DELETE_ROLE'
                             }
                         })
                         break;
@@ -87,12 +88,11 @@ class Role extends Component {
                         remove = this.state.role.filter(e => e.id === parseInt(table[3]))[0]
                         this.setState({
                             delete: {
-                                show: true,
+                                open: true,
                                 parentId: remove.id,
                                 childrenId: parseInt(table[5]),
-                                table: 0,
                                 parentCode: remove.code,
-                                childrenCode: table[3],
+                                action: 'DELETE_PERMISSION_ROLE'
                             }
                         })
                         console.log('aaa');
@@ -112,13 +112,11 @@ class Role extends Component {
             case 'permission':
                 remove = this.state.permission.filter(e => e.id === parseInt(table[2]))[0]
                 this.setState({
-                    openPermission: {
+                    openEditPermission: {
                         open: true,
                         title: 'Chỉnh sửa',
                         code: remove.code,
                         id: remove.id,
-                        name: remove.name,
-                        status: remove.status
                     },
                 })
                 break;
@@ -136,7 +134,7 @@ class Role extends Component {
                 break;
         }
     }
-    componentWillMount() {
+    componentDidMount() {
         this.getPermission()
         this.getRole()
     }
@@ -148,15 +146,21 @@ class Role extends Component {
             case 0:
                 return <span style={{
                     padding: '.5em .75em',
-                    textAlign: 'center', background: '#0abb87',
+                    textAlign: 'center', background: '#ffab02',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Đang sử dụng</span>
-            default:
+                }}>Đang chờ</span>
+            case 1:
                 return <span style={{
                     padding: '.5em .75em',
-                    textAlign: 'center', background: '#feac08',
+                    textAlign: 'center', background: '#fc424a',
                     borderRadius: '0.25rem', color: 'white',
-                }}>Đang tạm dừng</span>
+                }}>Đang khóa</span>
+            case 2:
+                return <span style={{
+                    padding: '.5em .75em',
+                    textAlign: 'center', background: '#0abb88',
+                    borderRadius: '0.25rem', color: 'white',
+                }}>Đang sử dụng</span>
 
 
         }
@@ -328,91 +332,100 @@ class Role extends Component {
         }
 
     }
-    confirm = (event, action, roleRequest) => {
+    confirm = (event) => {
         switch (event) {
-            case 0: // bang to role
-                let roleService = new RoleService();
-                switch (action) {
-                    case 0:
-                        this.setState({
-                            alertCustome: {
-                                show: true,
-                                message: 'Tạo thành công vai trò'
-                            },
-                            openRole: {
-                                open: false
-                            }
-                        })
-                        this.getRole()
-                        break;
-                    default:
-                        roleService.update(action, roleRequest).then(value => {
-                            this.setState({
-                                alertCustome: {
-                                    show: true,
-                                    message: 'Cập nhật thành công vai trò'
-                                }
-                            })
-                            this.getRole()
-                        }).catch(error => {
-                            this.fail(0)
-                        })
-                        this.setState({
-                            openRole: {
-                                open: false
-                            }
-                        })
-                        break;
-                }
-            case 1: // bang to permission
+            case 'UPDATE_ROLE_SUCCESS':
                 this.setState({
-                    openPermission: false,
                     alertCustome: {
                         show: true,
-                        message: 'Tạo thành công quyền hạn'
-                    }
-                })
-                this.getPermission()
-                this.getRole()
-                break;
-            case 3: // alert role
-                this.setState({
-                    delete: {
-                        show: false,
-                        id: 0,
-                        table: 0,
-                        code: ''
+                        message: 'Cập nhật vai trò thành công'
                     },
-                    alertCustome: {
-                        show: true,
-                        message: 'Xóa thành công'
+                    openEditRole: {
+                        open: false
                     }
                 })
                 this.getRole()
                 break;
-            case 4: // alert permission
+            case 'CREATE_ROLE_SUCCESS':
                 this.setState({
-                    delete: {
-                        show: false,
-                        id: 0,
-                        table: 0,
-                        code: ''
-                    },
                     alertCustome: {
                         show: true,
-                        message: 'Xóa thành công quyền hạn'
+                        message: 'Tạo mới vai trò thành công'
+                    },
+                    openCreateRole: {
+                        open: false
+                    }
+                })
+                this.getRole()
+                break;
+            case 'DELETE_ROLE_SUCCESS':
+                this.setState({
+                    alertCustome: {
+                        show: true,
+                        message: 'Xóa vai trò thành công'
+                    },
+                    delete: {
+                        open: false
+                    }
+                })
+                this.getRole()
+                break;
+            case 'DELETE_PERMISSION_ROLE':
+                this.setState({
+                    alertCustome: {
+                        show: true,
+                        message: 'Xóa quyền trong vai trò thành công'
+                    },
+                    delete: {
+                        open: false
+                    }
+                })
+                this.getRole()
+                break;
+            case 'CREATE_PERMISSION_SUCCESS':
+                this.setState({
+                    alertCustome: {
+                        show: true,
+                        message: 'Tạo quyền thành công'
+                    },
+                    openCreatePermission: {
+                        open: false
                     }
                 })
                 this.getPermission()
+                break;
+            case 'DELETE_PERMISSION_SUCCESS':
+                this.setState({
+                    alertCustome: {
+                        show: true,
+                        message: 'Xóa quyền thành công'
+                    },
+                    delete: {
+                        open: false
+                    }
+                })
                 this.getRole()
+                this.getPermission()
+                break;
+            case 'UPDATE_PERMISSION_SUCCESS':
+                this.setState({
+                    alertCustome: {
+                        show: true,
+                        message: 'Cập nhật quyền thành công'
+                    },
+                    openEditPermission: {
+                        open: false
+                    }
+                })
+                this.getRole()
+                this.getPermission()
                 break;
             default:
                 break;
         }
-
     }
-    cancel = (e) => {
-        switch (e) {
+    cancel = (event) => {
+        switch (event) {
             case 0:
                 this.setState({
                     openEditRole: {
@@ -421,12 +434,29 @@ class Role extends Component {
                     }
                 })
                 break;
-            case 1:
+            case 'CREATE_ROLE':
                 this.setState({
-                    openPermission: false
+                    openCreateRole: {
+                        open: false,
+                        id: 0
+                    }
                 })
                 break;
-            case 3:
+            case 'CREATE_PERMISSION_SUCCESS':
+                this.setState({
+                    openCreatePermission: {
+                        open: false
+                    }
+                })
+                break;
+            case 'UPDATE_PERMISSION':
+                this.setState({
+                    openEditPermission: {
+                        open: false
+                    }
+                })
+                break;
+            case 'DELETE_PERMISSION_ROLE':
                 this.setState({
                     delete: {
                         show: false,
@@ -436,7 +466,7 @@ class Role extends Component {
                     }
                 })
                 break;
-            case 4:
+            case 'DELETE_ROLE':
                 this.setState({
                     delete: {
                         show: false,
@@ -446,21 +476,23 @@ class Role extends Component {
                     }
                 })
                 break;
+
             default:
                 break;
         }
-
     }
     fail = (e) => {
         switch (e) {
-            case 0:
+            case 'UPDATE_ROLE_FAIL':
                 this.setState({
                     alertCustome: {
                         show: true,
-                        message: 'Tạo không thành công',
+                        message: 'Cập nhật vai trò không thành công',
                         severity: 'error'
                     },
-                    openRole: false
+                    openEditRole: {
+                        open: false
+                    }
                 })
                 break;
             case 1:
@@ -512,27 +544,18 @@ class Role extends Component {
         switch (e.currentTarget.id) {
             case 'role':
                 this.setState({
-                    openRole: {
+                    openCreateRole: {
                         open: true,
-                        title: 'Chỉnh sửa',
-                        code: '',
-                        id: 0,
-                        name: '',
-                        // status: 0,
-                        permission: []
-                    },
+                        title: 'Tạo mới'
+                    }
                 })
                 break;
 
             case 'permission':
                 this.setState({
-                    openPermission: {
+                    openCreatePermission: {
                         open: true,
-                        title: 'Chỉnh sửa',
-                        code: '',
-                        id: 0,
-                        name: '',
-                        status: 0
+                        title: 'Tạo mới',
                     },
                 })
                 break;
@@ -572,8 +595,7 @@ class Role extends Component {
         let rightColumns = ['action']
         return (
             <div className='row'>
-                <Init />
-                <Delete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
+                <DialogDelete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <AlertCustom value={this.state.alertCustome} close={this.cancelAlert} />
                 <Paper className='col-4' >
                     <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}` }}>Vai trò</div>
@@ -587,8 +609,7 @@ class Role extends Component {
                             <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
                                Thêm mới
                             </Button>
-                        <DialogCreateRole fail={this.fail} open={this.state.openRole} cancel={this.cancel} confirm={this.confirm}
-                            data={this.state.permission} />
+                        <DialogCreateRole fail={this.fail} data={this.state.openCreateRole} cancel={this.cancel} confirm={this.confirm} />
                         <DialogEditRole fail={this.fail} data={this.state.openEditRole} cancel={this.cancel} confirm={this.confirm} />
                     </div>
                     <Grid rows={this.state.role}
@@ -621,7 +642,9 @@ class Role extends Component {
                             <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
                                Thêm mới
                         </Button>
-                        <DialogPermission fail={this.fail} open={this.state.openPermission} cancel={this.cancel}
+                        <DialogCreatePermission fail={this.fail} data={this.state.openCreatePermission} cancel={this.cancel}
+                            confirm={this.confirm} />
+                        <DialogEditPermission fail={this.fail} data={this.state.openEditPermission} cancel={this.cancel}
                             confirm={this.confirm} />
                     </div>
                     <Grid

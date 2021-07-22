@@ -72,15 +72,15 @@ class Booking extends Component {
   }
 
   state = {
-    selected: this.props.state.selectedBookings,
-    tab: this.props.state.tabBookings,
-    display: this.props.state.displayBookings,
+    selected: this.props.state.selectedBooking,
+    tab: this.props.state.tabBooking,
+    display: this.props.state.displayBooking,
     textColor: 'black',
   }
 
   changeTab = (e, value) => {
-    if (this.props.state.selectStateBookings === true) {
-      if (this.props.state.tabBookings === value) {
+    if (this.props.state.selectStateBooking === true) {
+      if (this.props.state.tabBooking === value) {
         this.props.dispatch(action('CHANGE_STATE_TAB', {
           selectState: false,
           display: 'none',
@@ -113,7 +113,7 @@ class Booking extends Component {
     return (
       <div>
         <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}`, overflow: 'visible' }}>Danh sách đặt chuyến</div>
-        <Book selected={this.state.selected} panel={1} height={'600px'} />
+        <Book selected={this.state.selected} panel={'booking'} height={'600px'} />
       </div >
     )
   }

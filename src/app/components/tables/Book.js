@@ -77,7 +77,7 @@ class Book extends Component {
     // const defaultHiddenColumnNames = []
     render() {
         let selectedBookings = []
-        this.props.state.selectedBookings.forEach(e => {
+        this.props.state.selectedBooking.forEach(e => {
             if (e.checked === true)
                 selectedBookings.push(
                     {

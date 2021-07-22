@@ -15,7 +15,7 @@ class App extends Component {
     let page = window.location.pathname
 
     switch (page) {
-      case '/bookings':
+      case '/booking':
         path = 'Đặt chuyến'
         break;
       case '/method/vehicle':

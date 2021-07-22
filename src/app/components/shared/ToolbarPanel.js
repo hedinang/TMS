@@ -6,26 +6,25 @@ import {
     DialogContentText, DialogTitle, Dialog, Paper, Grid, MenuItem, TextField
 } from '@material-ui/core';
 import React from 'react';
-import TabPanelBookings from '../tables/TabPanelBookings'
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
 import { faEye, faPlusSquare, faInfoCircle, faTv } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import TabPanelDashboard from '../tables/TabPanelDashboard';
-import TabCustome from './TabCustome'
 import TabPanelAccount from '../tables/TabPanelAccount';
+import TabPanelBooking from '../tables/TabPanelBooking';
 import { DialogCreateAccount, DialogEditAccount } from '../dialog/DialogAccount'
 class ToolbarPanel extends React.PureComponent {
     state = {
-        selectedBooking: this.props.state.selectedBookings,
+        selectedBooking: this.props.state.selectedBooking,
         selectedMonitor: this.props.state.selectedMonitor,
         selectedDetail: this.props.state.selectedDetail,
         selectedAccount: this.props.state.selectedAccount,
 
-        tab: this.props.state.tabBookings,
+        tab: this.props.state.tabBooking,
         tabAccount: this.props.state.tabAccount,
 
-        display: this.props.state.displayBookings,
+        display: this.props.state.displayBooking,
         displayAccount: this.props.state.displayAccount,
 
         open: false,
@@ -50,18 +49,7 @@ class ToolbarPanel extends React.PureComponent {
         ],
         account: {
             open: false,
-
         },
-        edit: {
-            username: '',
-            password: '',
-            name: '',
-            email: '',
-            phone: '',
-            role: '',
-            status: '',
-            parentId: '',
-        }
     }
 
     changeTab = (e, value) => {
@@ -97,7 +85,7 @@ class ToolbarPanel extends React.PureComponent {
     }
     changeTabBooking = (e, value) => {
         if (value === 0) {
-            if (this.props.state.selectStateBookings === true) {
+            if (this.props.state.selectStateBooking === true) {
                 this.props.dispatch(action('CHANGE_STATE_TAB', {
                     selectState: false,
                     display: 'none',
@@ -200,8 +188,8 @@ class ToolbarPanel extends React.PureComponent {
                     }
                 })
                 break;
-            case 2:
-                this.props.cancel(2)
+            case 'CANCEL_USER_UPDATE':
+                this.props.cancel('CANCEL_USER_UPDATE')
                 break;
             default:
                 break;
@@ -244,10 +232,6 @@ class ToolbarPanel extends React.PureComponent {
                     Chi tiết chuyến xe 2345
                 </div>
             case 'account':
-                let data = {
-                    user: this.props.user,
-                    role: this.props.role
-                }
                 return <div style={{ width: '80rem', borderStyle: 'none', }}>
                     <AppBar position="static" className='rounded-top' style={{
                         background: 'white', color: 'black',
@@ -278,9 +262,9 @@ class ToolbarPanel extends React.PureComponent {
                                             icon={faPlusSquare} className='mr-2' />
                                         <span>Tạo mới</span>
                                     </button>
-                                    <DialogCreateAccount open={this.state.account}
+                                    <DialogCreateAccount create={this.state.account}
                                         confirm={this.addItem} cancel={this.cancel} />
-                                    <DialogEditAccount data={data} edit={this.props.edit}
+                                    <DialogEditAccount edit={this.props.edit}
                                         confirm={this.addItem} cancel={this.cancel} />
                                 </div>}
                             />
@@ -295,23 +279,56 @@ class ToolbarPanel extends React.PureComponent {
                         }} selected={this.state.selectedAccount} id={this.props.state.tabAccount} />
                     </div>
                 </div>
-            case 'role':
-                return <div style={{ width: '80rem', borderStyle: 'none', }}>
-                    <AppBar position="static" className='rounded-top' style={{
-                        background: 'white', color: 'black',
-                        borderStyle: 'none', boxShadow: 'none'
-                    }}>
-                        
-                    </AppBar>
-                    <div id='tabPanel' style={{ display: `${this.state.display}`, borderStyle: 'none', background: 'white', }} >
-                        <TabPanelBookings checked={() => {
-                            this.props.reload()
-                            this.setState({
-                                selectedBooking: this.props.state.selectedBooking
-                            })
-                        }} selected={this.state.selectedBooking} id={this.props.state.tabBookings} />
+            case 'booking':
+                return (
+                    <div style={{ width: '80rem', borderStyle: 'none' }}>
+                        <AppBar position="static" className='rounded-top' style={{
+                            background: 'white', color: 'black',
+                            borderStyle: 'none', boxShadow: 'none',
+                        }}>
+                            <Tabs value={this.state.tab}
+                                TabIndicatorProps={{ style: { background: "white", } }}
+                                onChange={this.changeTabBooking} >
+                                <Tab style={{ opacity: 1, textAlign: 'center' }} label={<div>
+                                    <FontAwesomeIcon icon={faEye} className='mr-2' />
+                                    <span>Hiển thị</span>
+                                </div>} />
+                                <Tab
+                                    id='tab' style={{ opacity: 1 }} label={<div>
+                                        <button
+                                            style={{ border: 'none', textTransform: 'uppercase' }}
+                                            onClick={
+                                                e => {
+                                                    this.setState({
+                                                        account: {
+                                                            open: true,
+                                                            id: 0
+                                                        }
+                                                    })
+                                                }
+                                            }>
+                                            <FontAwesomeIcon
+                                                icon={faPlusSquare} className='mr-2' />
+                                            <span>Tạo mới</span>
+                                        </button>
+                                        {/* <DialogCreateAccount create={this.state.account}
+                                        confirm={this.addItem} cancel={this.cancel} />
+                                    <DialogEditAccount edit={this.props.edit}
+                                        confirm={this.addItem} cancel={this.cancel} /> */}
+                                    </div>}
+                                />
+                            </Tabs>
+                        </AppBar>
+                        <div id='tabPanel' style={{ display: `${this.state.display}`, borderStyle: 'none', background: 'white', }} >
+                            <TabPanelBooking checked={() => {
+                                this.props.reload()
+                                this.setState({
+                                    selectedBooking: this.props.state.selectedBooking
+                                })
+                            }} selected={this.state.selectedBooking} id={this.props.state.tabBooking} />
+                        </div>
                     </div>
-                </div>
+                )
         }
     }
     render() {

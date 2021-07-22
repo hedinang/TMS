@@ -10,9 +10,9 @@ import {
     AppBar, Button, Tab, Tabs, DialogActions, DialogContent, Input, Slider, GridListTile, GridList,
     DialogContentText, DialogTitle, Dialog, Paper, Grid, Checkbox, MenuItem, Select
 } from '@material-ui/core';
-class TabPanelBookings extends Component {
+class TabPanelBooking extends Component {
     state = {
-        selectedBookings: this.props.state.selectedBookings,
+        selectedBooking: this.props.state.selectedBooking,
         bookColumn: [
             {
                 'field': 'fee',
@@ -107,8 +107,8 @@ class TabPanelBookings extends Component {
     clickAll = (event) => {
         if (event.nativeEvent.target.id === 'all') {
             this.setState({
-                selectedBookings: [
-                    ...this.state.selectedBookings.map(e => {
+                selectedBooking: [
+                    ...this.state.selectedBooking.map(e => {
                         e.checked = true
                         return e
                     })
@@ -120,8 +120,8 @@ class TabPanelBookings extends Component {
         } else {
             let checked = this.state.checked
             this.setState({
-                selectedBookings: [
-                    ...this.state.selectedBookings.map(e => {
+                selectedBooking: [
+                    ...this.state.selectedBooking.map(e => {
                         if (e.field === event.nativeEvent.target.id) {
                             if (e.checked === true) {
                                 e.checked = false
@@ -167,7 +167,7 @@ class TabPanelBookings extends Component {
                                 Chọn tất</button>
                         <div >Có {this.state.checked}/9 loại được chọn hiển thị</div>
                         <GridList cellHeight={50} cols={6} >
-                            {this.state.selectedBookings.map(e => {
+                            {this.state.selectedBooking.map(e => {
                                 return <GridListTile key={e.field}>
                                     <div >
                                         <Checkbox
@@ -191,4 +191,4 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(TabPanelBookings);
+export default connect(select)(TabPanelBooking);

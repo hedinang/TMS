@@ -3,7 +3,7 @@ import {
 } from '@devexpress/dx-react-core';
 import { AppBar, Button, Tab, Tabs } from '@material-ui/core';
 import React, { useState } from 'react';
-import TabPanelBookings from '../../tables/TabPanelBookings'
+import TabPanelBooking from '../../tables/TabPanelBooking'
 import { connect } from 'react-redux'
 import { action } from '../../../redux/actions/actions'
 import { faEye, faPlusSquare, faInfoCircle, faTv } from '@fortawesome/fontawesome-free-solid'
