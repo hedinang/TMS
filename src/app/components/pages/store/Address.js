@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import TableAccount from '../../tables/TableAccount'
-class Account extends Component {
+class Address extends Component {
 
   // var sse = new EventSource('http://localhost:8090/tms/trip-monitor/sse');
   // sse.onmessage = function (evt) {
@@ -33,4 +33,4 @@ function select(state) {
     state: state.reducer
   }
 }
-export default connect(select)(Account);
+export default connect(select)(Address);

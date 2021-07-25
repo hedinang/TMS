@@ -15,7 +15,7 @@ let pages = [1, pageSize, "id", 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
 
-function DialogCreateAccount(event) {
+function DialogCreateBooking(event) {
     let [open, setOpen] = useState(false)
     let [user, setUser] = useState({})
     let [status, setStatus] = useState([])
@@ -54,7 +54,7 @@ function DialogCreateAccount(event) {
         })
     }
     let cancel = () => {
-        event.cancel('CREATE_USER')
+        event.cancel(1)
     }
     let changeName = (e) => {
         user.name = e.target.value
@@ -92,12 +92,12 @@ function DialogCreateAccount(event) {
             <DialogContent style={{ height: '50rem', width: '80rem', maxWidth: 'none' }}>
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
-                        <div>Họ và tên</div>
+                        <div>Mã đặt chuyến</div>
                         <Input
                             name="name" title='Tên' onChange={changeName}></Input>
                     </Grid>
                     <Grid item xs={4}>
-                        <div>Tên đăng nhập</div>
+                        <div>Tên người đặt</div>
                         <Input
                             name="username" title='Tên' onChange={changeUsername}></Input>
                     </Grid>
@@ -156,7 +156,7 @@ function DialogCreateAccount(event) {
         </Dialog>
     )
 }
-function DialogEditAccount(event) {
+function DialogEditBooking(event) {
     let getItem = (id, array) => {
         if (id === undefined)
             return {}
@@ -322,19 +322,4 @@ function DialogEditAccount(event) {
         </Dialog>
     )
 }
-function AlertCustom(event) {
-    let close = (e) => {
-        event.close(0)
-    }
-    return (<Snackbar open={event.value.show} autoHideDuration={3000}
-        onClose={close}
-    >
-        <Alert
-            style={{ background: '#00d25b', color: 'white' }}
-            onClose={close}
-            severity={event.value.severity}>
-            {event.value.message}
-        </Alert>
-    </Snackbar>)
-}
-export { DialogCreateAccount, DialogEditAccount, AlertCustom }
+export { DialogCreateBooking, DialogEditBooking }

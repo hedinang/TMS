@@ -41,7 +41,7 @@ function DialogCreatePermission(event) {
         })
     }
     let cancel = () => {
-        event.cancel(1)
+        event.cancel('CREATE_PERMISSION')
     }
     return (
         <Dialog

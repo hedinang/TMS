@@ -185,7 +185,7 @@ let initState = {
             'field': 'id',
             'title': 'STT',
             'width': '100px',
-            'checked': true
+            'checked': false
 
         },
         {
@@ -410,14 +410,14 @@ function reducer(state = initState, action) {
             }
             else {
                 state['selectStateBooking'] = action.value.selectState
-                state['displayBookings'] = action.value.display
+                state['displayBooking'] = action.value.display
             }
             return state
         case 'CHANGE_VALUE_TAB':
             if (action.value.id === 0)
                 state['tabDashboard'] = action.value.tab
             else
-                state['tabBookings'] = action.value.tab
+                state['tabBooking'] = action.value.tab
             return state
         case 'CHANGE_CHECKED':
             state['checked'] = action.value

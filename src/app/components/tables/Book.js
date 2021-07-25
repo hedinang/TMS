@@ -13,6 +13,7 @@ import {
 import { faTrashAlt, faPencilAlt } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { Component } from 'react';
+import TabPanelBooking from './TabPanelBooking';
 class Book extends Component {
     state = {
         data: [{
@@ -233,7 +234,7 @@ class Book extends Component {
                     <Toolbar />
                     {/* <ToolbarButton /> */}
 
-                    <ToolbarPanel panel={this.props.panel} reload={() => {
+                    {/* <ToolbarPanel panel={this.props.panel} reload={() => {
                         if (this.state.reload === 0)
                             this.setState({
                                 reload: 1
@@ -241,7 +242,8 @@ class Book extends Component {
                         else this.setState({
                             reload: 0
                         })
-                    }} />
+                    }} /> */}
+                    <TabPanelBooking/>
 
                     <PagingPanel
                         pageSizes={pageSizes}

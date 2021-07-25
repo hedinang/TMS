@@ -131,7 +131,7 @@ class Dashboard extends Component {
   render() {
     return (
       <div>
-        <div className="row h-100">
+        <div className="row">
           <div className="col-12">
             <div className='text-center' style={{ color: `${this.state.textColor}` }}>Giám sát chuyến xe</div>
             <Monitor panel='monitor' height={'400px'} reload={() => {

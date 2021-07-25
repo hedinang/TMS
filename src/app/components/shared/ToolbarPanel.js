@@ -11,7 +11,7 @@ import { action } from '../../redux/actions/actions'
 import { faEye, faPlusSquare, faInfoCircle, faTv } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import TabPanelDashboard from '../tables/TabPanelDashboard';
-import TabPanelAccount from '../tables/TabPanelAccount';
+
 import TabPanelBooking from '../tables/TabPanelBooking';
 import { DialogCreateAccount, DialogEditAccount } from '../dialog/DialogAccount'
 class ToolbarPanel extends React.PureComponent {
@@ -231,54 +231,7 @@ class ToolbarPanel extends React.PureComponent {
                 return <div style={{ width: '120rem', borderStyle: 'none', textAlign: 'center', color: '#679b2f' }}>
                     Chi tiết chuyến xe 2345
                 </div>
-            case 'account':
-                return <div style={{ width: '80rem', borderStyle: 'none', }}>
-                    <AppBar position="static" className='rounded-top' style={{
-                        background: 'white', color: 'black',
-                        borderStyle: 'none', boxShadow: 'none'
-                    }}>
-                        <Tabs value={this.state.tab}
-                            TabIndicatorProps={{ style: { background: "white", } }}
-                            onChange={this.changeTabBooking} >
-                            <Tab style={{ opacity: 1, textAlign: 'center' }} label={<div>
-                                <FontAwesomeIcon icon={faEye} className='mr-2' />
-                                <span>Hiển thị</span>
-                            </div>} />
-                            <Tab
-                                id='tab' style={{ opacity: 1 }} label={<div>
-                                    <button
-                                        style={{ border: 'none', textTransform: 'uppercase' }}
-                                        onClick={
-                                            e => {
-                                                this.setState({
-                                                    account: {
-                                                        open: true,
-                                                        id: 0
-                                                    }
-                                                })
-                                            }
-                                        }>
-                                        <FontAwesomeIcon
-                                            icon={faPlusSquare} className='mr-2' />
-                                        <span>Tạo mới</span>
-                                    </button>
-                                    <DialogCreateAccount create={this.state.account}
-                                        confirm={this.addItem} cancel={this.cancel} />
-                                    <DialogEditAccount edit={this.props.edit}
-                                        confirm={this.addItem} cancel={this.cancel} />
-                                </div>}
-                            />
-                        </Tabs>
-                    </AppBar>
-                    <div id='tabPanel' style={{ display: `${this.state.display}`, borderStyle: 'none', background: 'white', }} >
-                        <TabPanelAccount checked={() => {
-                            this.props.reload()
-                            this.setState({
-                                selectedAccount: this.props.state.selectedAccount
-                            })
-                        }} selected={this.state.selectedAccount} id={this.props.state.tabAccount} />
-                    </div>
-                </div>
+            
             case 'booking':
                 return (
                     <div style={{ width: '80rem', borderStyle: 'none' }}>

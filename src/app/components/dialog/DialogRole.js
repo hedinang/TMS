@@ -46,8 +46,10 @@ function DialogCreateRole(event) {
             setName('')
             setCode('')
             setAll(false)
+            setOpen(true)
         }
-        setOpen(event.data.open)
+        else
+            setOpen(false)
     }, [event.data.open])
     let chossePermission = (event) => {
         if (event.target.id === 'all') {

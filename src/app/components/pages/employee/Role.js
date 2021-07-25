@@ -17,7 +17,6 @@ import { DialogCreatePermission, DialogEditPermission, AlertCustom } from '../..
 import { DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
 import { DialogDelete } from '../../dialog/DialogDelete'
 class Role extends Component {
-
     state = {
         selected: this.props.state.selectedAccount,
         tab: this.props.state.tabRole,
@@ -426,9 +425,9 @@ class Role extends Component {
     }
     cancel = (event) => {
         switch (event) {
-            case 0:
+            case 'CREATE_PERMISSION':
                 this.setState({
-                    openEditRole: {
+                    openCreatePermission: {
                         open: false,
                         id: 0
                     }

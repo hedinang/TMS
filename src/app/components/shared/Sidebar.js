@@ -1,296 +1,152 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Collapse, Dropdown } from 'react-bootstrap';
+import Collapse from '@material-ui/core/Collapse';
 import { Trans } from 'react-i18next';
 import { AiOutlineMenu } from 'react-icons/ai'
 import { connect } from 'react-redux'
 import { action } from '../../redux/actions/actions'
-import { faAngleDown } from '@fortawesome/fontawesome-free-solid'
+import { faBars, faAngleDown } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-class Sidebar extends Component {
+import { List, ListItem, ListItemIcon, ListItemText, ListSubheader, makeStyles } from '@material-ui/core';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import StarBorder from '@material-ui/icons/StarBorder';
+import IconButton from '@material-ui/core/IconButton';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import Drawer from '@material-ui/core/Drawer';
+import clsx from 'clsx';
+function Sidebar() {
 
-  state = {
-    backgroundColor: 'white',
-    textColor: 'green',
-    aiOutlineMenu: 'black',
-    width: '200px',
-  }
 
-  toggleMenuState(menuState) {
-    if (this.state[menuState]) {
-      this.setState({ [menuState]: false });
-    } else if (Object.keys(this.state).length === 0) {
-      this.setState({ [menuState]: true });
-    } else {
-      Object.keys(this.state).forEach(i => {
-        this.setState({ [i]: false });
-      });
-      this.setState({ [menuState]: true });
+  let [open, setOpen] = useState(false)
+
+  let drawerWidth = 200
+  let useStyles = makeStyles((theme) => ({
+    root: {
+      display: 'flex',
+      minHeight: '32px',
+      "& .MuiPaper-root": {
+
+        // borderRadius: "100px",
+        boxShadow: "none",
+        borderRight: "none",
+      },
+      "& .MuiToolbar-regular": {
+
+        minHeight: 'none'
+      },
+    },
+    appBar: {
+
+      zIndex: theme.zIndex.drawer + 1,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      marginLeft: drawerWidth,
+      width: `calc(100% - ${drawerWidth}px)`,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    menuButton: {
+      marginRight: 36,
+    },
+    hide: {
+      display: 'none',
+    },
+    drawer: {
+      width: drawerWidth,
+      flexShrink: 0,
+      whiteSpace: 'nowrap',
+    },
+    drawerOpen: {
+      width: drawerWidth,
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    drawerClose: {
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      overflowX: 'hidden',
+      width: theme.spacing(7) + 1,
+      [theme.breakpoints.up('sm')]: {
+        width: theme.spacing(9) + 1,
+      },
+    },
+    toolbar: {
+      border: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      ...theme.mixins.toolbar,
+    },
+    content: {
+      fontSize: '15px',
+      border: 'none',
+      flexGrow: 1,
+      paddingTop: theme.spacing(8),
+      overflow: 'hiden',
+      maxWidth: '1760px'
+    },
+    nested: {
+      paddingLeft: theme.spacing(4)
+    },
+    primary: {
+      paddingLeft: theme.spacing(3)
     }
-  }
+  }));
+  let classes = useStyles()
+  return (
+    <Drawer
+      variant="permanent"
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open,
+      })}
+      classes={{
+        paper: clsx({
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        }),
+      }}
+    >
+      <div className={classes.toolbar}>
+        <button
+          // onClick={handleDrawerClose}
+          style={{ background: 'white', border: 'none', fontSize: '1.1rem', outlineStyle: 'none' }}>
+          <FontAwesomeIcon icon={faBars} className='mr-2' />
+        </button>
+      </div>
+      <List>
+        <ListItem button key='text' className={classes.primary} component="a" href="/employee/account">
+          <ListItemIcon ><InboxIcon /></ListItemIcon>
+          <ListItemText primary='text' />
+        </ListItem>
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItem button className={classes.nested}>
+              <ListItemIcon>
+                <StarBorder />
+              </ListItemIcon>
+              <ListItemText primary="Starred" />
+              {/* <Link to="/employee/account" id='store' /> */}
+            </ListItem>
+          </List>
+        </Collapse>
+      </List>
+    </Drawer>
+  )
 
-  componentDidUpdate(prevProps) {
-    if (this.props.location !== prevProps.location) {
-      this.onRouteChanged();
-    }
-  }
-
-  onRouteChanged() {
-    document.querySelector('#sidebar').classList.remove('active');
-    Object.keys(this.state).forEach(i => {
-      this.setState({ [i]: false });
-    });
-
-    const dropdownPaths = [
-      { path: '/apps', state: 'appsMenuOpen' },
-      { path: '/basic-ui', state: 'basicUiMenuOpen' },
-      { path: '/form-elements', state: 'formElementsMenuOpen' },
-      { path: '/tables', state: 'tablesMenuOpen' },
-      { path: '/icons', state: 'iconsMenuOpen' },
-      { path: '/charts', state: 'chartsMenuOpen' },
-      { path: '/user-pages', state: 'userPagesMenuOpen' },
-      { path: '/error-pages', state: 'errorPagesMenuOpen' },
-    ];
-
-    dropdownPaths.forEach((obj => {
-      if (this.isPathActive(obj.path)) {
-        this.setState({ [obj.state]: true })
-      }
-    }));
-
-  }
-  changeNavBar = (e) => {
-    let navBar = e.currentTarget.id
-    let strNavBar = ''
-    switch (navBar) {
-      case 'dashboard':
-        strNavBar = 'Trang chủ'
-        break;
-      case 'booking':
-        strNavBar = 'Đặt chuyến'
-        break;
-      case '/method/vehicle':
-        strNavBar = 'Phương tiện'
-        break;
-      case '/method/device':
-        strNavBar = 'Phương tiện'
-        break;
-      case 'store':
-        strNavBar = 'Quản lý kho'
-        break;
-      default:
-        break;
-    }
-    this.props.dispatch(action('CHANGE_NAVBAR', strNavBar))
-    this.props.click()
-  }
-  clickAiOutlineMenu = (e) => {
-    document.body.classList.toggle('sidebar-icon-only')
-    if (this.state.width === '')
-      this.setState({
-        width: '200px',
-      })
-    else
-      this.setState({
-        width: '',
-      })
-  }
-  render() {
-
-    return (
-      <nav className="sidebar" id="sidebar" style={{
-        backgroundColor: `${this.state.backgroundColor}`,
-        border: '1px solid rgba(0, 0, 0, 0.05)',
-      }}>
-        <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top"
-          style={{ backgroundColor: `${this.state.backgroundColor}` }}
-        >
-          <a className="sidebar-brand brand-logo"><img src={require('../../../assets/images/icons/logistic_icon.png')} alt="logo" /></a>
-          <AiOutlineMenu size={26} onClick={this.clickAiOutlineMenu} style={{ color: `${this.state.aiOutlineMenu}` }} />
-        </div>
-        <ul className="nav">
-          <li className="nav-item profile">
-            <div className="profile-desc">
-              <Dropdown alignRight>
-                <Dropdown.Menu className="sidebar-dropdown preview-list">
-                  <a href="!#" className="dropdown-item preview-item" onClick={evt => evt.preventDefault()}>
-                    <div className="preview-thumbnail">
-                      <div className="preview-icon bg-dark rounded-circle">
-                        <i className="mdi mdi-settings text-primary"></i>
-                      </div>
-                    </div>
-                    <div className="preview-item-content">
-                      <p className="preview-subject ellipsis mb-1 text-small"><Trans>Account settings</Trans></p>
-                    </div>
-                  </a>
-                  <div className="dropdown-divider"></div>
-                  <a href="!#" className="dropdown-item preview-item" onClick={evt => evt.preventDefault()}>
-                    <div className="preview-thumbnail">
-                      <div className="preview-icon bg-dark rounded-circle">
-                        <i className="mdi mdi-onepassword  text-info"></i>
-                      </div>
-                    </div>
-                    <div className="preview-item-content">
-                      <p className="preview-subject ellipsis mb-1 text-small"><Trans>Change Password</Trans></p>
-                    </div>
-                  </a>
-                  <div className="dropdown-divider"></div>
-                  <a href="!#" className="dropdown-item preview-item" onClick={evt => evt.preventDefault()}>
-                    <div className="preview-thumbnail">
-                      <div className="preview-icon bg-dark rounded-circle">
-                        <i className="mdi mdi-calendar-today text-success"></i>
-                      </div>
-                    </div>
-                    <div className="preview-item-content">
-                      <p className="preview-subject ellipsis mb-1 text-small"><Trans>To-do list</Trans></p>
-                    </div>
-                  </a>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </li>
-          <li className={this.isPathActive('/dashboard') ? 'nav-item menu-items active' : 'nav-item menu-items'}  >
-            <Link style={{ width: `${this.state.width}` }} id='dashboard' className="nav-link" to="/dashboard"
-            //  onClick={
-            //   this.changeNavBar
-            // }
-            >
-              <span className="menu-icon"><i className="mdi mdi-speedometer"></i></span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Trang chủ</span>
-            </Link>
-          </li>
-          <li className={this.isPathActive('/booking') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/booking" id='booking'
-            // onClick={
-            //   this.changeNavBar
-            // }
-            >
-              <span className="menu-icon">
-                <i className="mdi mdi-playlist-play"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Đặt chuyến</span>
-            </Link>
-          </li>
-          <li className={this.isPathActive('/method') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div style={{ width: `${this.state.width}` }} className={this.state.tablesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('tablesMenuOpen')} data-toggle="collapse">
-              <span className="menu-icon">
-                <i className="mdi mdi-table-large"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Phương tiện</span>
-              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
-            </div>
-            <Collapse in={this.state.tablesMenuOpen}>
-              <div>
-                <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/vehicle' className={this.isPathActive('/method/vehicle') ? 'nav-link active' : 'nav-link'} to="/method/vehicle"
-                  // onClick={ this.changeNavBar}
-                  >Xe</Link></li>
-                  <li className="nav-item"> <Link style={{ color: `${this.state.textColor}` }} id='/method/device' className={this.isPathActive('/method/device') ? 'nav-link active' : 'nav-link'} to="/method/device"
-                  // onClick={this.changeNavBar}
-                  >Thiết bị</Link></li>
-                </ul>
-              </div>
-            </Collapse>
-          </li>
-          <li className={this.isPathActive('/store') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <Link style={{ width: `${this.state.width}` }} className="nav-link" to="/store" id='store'
-            // onClick={this.changeNavBar}
-            >
-              <span className="menu-icon">
-                <i className="mdi mdi-chart-bar"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Quản lý kho</span>
-            </Link>
-          </li>
-          <li className={this.isPathActive('/icons') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div style={{ width: `${this.state.width}` }} className={this.state.iconsMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('iconsMenuOpen')} data-toggle="collapse">
-              <span className="menu-icon">
-                <i className="mdi mdi-contacts"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Tài xế</span>
-              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
-
-            </div>
-            <Collapse >
-              <div>
-                <ul className="nav flex-column sub-menu">
-                  <li className="nav-item">
-                    <Link style={{ color: `${this.state.textColor}` }} className={this.isPathActive('/icons/mdi') ? 'nav-link active' : 'nav-link'} to="/icons/mdi">Material</Link>
-                  </li>
-                </ul>
-              </div>
-            </Collapse>
-          </li>
-          <li className={this.isPathActive('/abc') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div style={{ width: `${this.state.width}` }} className={this.state.userPagesMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('userPagesMenuOpen')} data-toggle="collapse">
-              <span className="menu-icon">
-                <i className="mdi mdi-security"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Đấu thầu</span>
-              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
-            </div>
-            <Collapse in={this.state.userPagesMenuOpen}>
-              <div>
-                <ul className="nav flex-column sub-menu">
-                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/login-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/login-1" style={{ color: `${this.state.textColor}` }} >Login</Link></li>
-                  <li className="nav-item"> <Link className={this.isPathActive('/user-pages/register-1') ? 'nav-link active' : 'nav-link'} to="/user-pages/register-1" style={{ color: `${this.state.textColor}` }} >Register</Link></li>
-                </ul>
-              </div>
-            </Collapse>
-          </li>
-          <li className={this.isPathActive('/employee') ? 'nav-item menu-items active' : 'nav-item menu-items'}>
-            <div style={{ width: `${this.state.width}` }} className={this.state.iconsMenuOpen ? 'nav-link menu-expanded' : 'nav-link'} onClick={() => this.toggleMenuState('iconsMenuOpen')}>
-              <span className="menu-icon">
-                <i className="mdi mdi-file-document-box"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }}>Quản lý nhân sự</span>
-              <FontAwesomeIcon style={{ marginLeft: 'auto' }} icon={faAngleDown} />
-            </div>
-            <Collapse in={this.state.iconsMenuOpen}>
-              <div>
-                <ul className="nav flex-column sub-menu">
-                  <li className="nav-item">
-                    <Link style={{ color: `${this.state.textColor}` }} className="nav-link" to="/employee/account" id='/employee/account'>Tài khoản</Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link style={{ color: `${this.state.textColor}` }} className="nav-link" to="/employee/role" id='/employee/role'>Phân quyền</Link>
-                  </li>
-                </ul>
-              </div>
-            </Collapse>
-
-          </li>
-          <li className="nav-item menu-items">
-            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
-              <span className="menu-icon">
-                <i className="mdi mdi-file-document-box"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Cài đặt hệ thống</span>
-            </a>
-          </li>
-          <li className="nav-item menu-items">
-            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
-              <span className="menu-icon">
-                <i className="mdi mdi-file-document-box"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Báo cáo</span>
-            </a>
-          </li>
-          <li className="nav-item menu-items">
-            <a style={{ width: `${this.state.width}` }} className="nav-link" href="http://bootstrapdash.com/demo/corona-react-free/documentation/documentation.html" rel="noopener noreferrer" target="_blank">
-              <span className="menu-icon">
-                <i className="mdi mdi-file-document-box"></i>
-              </span>
-              <span className="menu-title" style={{ color: `${this.state.textColor}` }} >Cài đặt ứng</span>
-            </a>
-          </li>
-        </ul>
-      </nav >
-    );
-  }
-  isPathActive(path) {
-    return this.props.location.pathname.startsWith(path)
-  }
 }
 function select(state) {
   return {

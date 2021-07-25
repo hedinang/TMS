@@ -4,7 +4,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import Spinner from './components/shared/Spinner';
 
 const Dashboard = lazy(() => import('./components/pages/DashBoard'));
-const Store = lazy(() => import('./components/pages/Store'));
+const Address = lazy(() => import('./components/pages/store/Address'));
 const Booking = lazy(() => import('./components/pages/Booking'));
 const Device = lazy(() => import('./components/pages/method/Device'));
 const Account = lazy(() => import('./components/pages/employee/Account'));
@@ -55,9 +55,8 @@ class AppRoutes extends Component {
           <PrivateRoute access={this.props.access} path='/method/device' component={Device} />
           <PrivateRoute access={this.props.access} path='/employee/account' component={Account} />
           <PrivateRoute access={this.props.access} path='/employee/role' component={Role} />
-          <PrivateRoute access={this.props.access} path='/dashboard' component={Dashboard} />
           {/* <Route path="/dashboard" component={Dashboard} /> */}
-          <PrivateRoute access={this.props.access} path="/store" component={Store} />
+          <PrivateRoute access={this.props.access} path="/store/address" component={Address} />
           <PrivateRoute access={this.props.access} path="/form-Elements/basic-elements" component={BasicElements} />
           <PrivateRoute access={this.props.access} path="/tables/basic-table" component={BasicTable} />
           <PrivateRoute access={this.props.access} path="/icons/mdi" component={Mdi} />
