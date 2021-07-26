@@ -236,14 +236,17 @@ function DeletePermission(event) {
     )
 }
 function AlertCustom(event) {
-    return (<Snackbar open={event.value.show} autoHideDuration={3000}
-        onClose={event.close}
+    let close = () => {
+        event.close('CLOSE_ALERT')
+    }
+    return (<Snackbar open={event.data.show} autoHideDuration={3000}
+        onClose={close}
     >
         <Alert
             style={{ background: '#00d25b', color: 'white' }}
-            onClose={event.close}
-            severity={event.value.severity}>
-            {event.value.message}
+            onClose={close}
+            severity={event.data.severity}>
+            {event.data.message}
         </Alert>
     </Snackbar>)
 }

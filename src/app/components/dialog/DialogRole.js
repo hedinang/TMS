@@ -13,14 +13,11 @@ let permissionService = new PermissionService()
 let pages = [1, 10, "id", 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
-
-
 function checkExist(id, array) {
     if (array.filter(e => e.id === id).length === 0)
         return false
     return true
 }
-
 function DialogCreateRole(event) {
     let [permission, setPermission] = useState([])
     let [totalCheck, setTotalCheck] = useState(0)
@@ -28,7 +25,6 @@ function DialogCreateRole(event) {
     let [open, setOpen] = useState(false)
     let [code, setCode] = useState('')
     let [name, setName] = useState('')
-
     useEffect(() => {
         if (event.data.open === true) {
             permissionService.search(condition).then(value => {
@@ -64,7 +60,6 @@ function DialogCreateRole(event) {
             })
             all = true
             totalCheck = permission.length
-
         } else {
             if (event.target.checked === true) {
                 if (totalCheck === permission.length - 1)
@@ -183,7 +178,6 @@ function DialogCreateRole(event) {
         </Dialog>
     )
 }
-
 function DialogEditRole(event) {
     let [code, setCode] = useState('')
     let [name, setName] = useState('')

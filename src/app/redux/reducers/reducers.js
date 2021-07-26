@@ -311,6 +311,56 @@ let initState = {
 
         }
     ],
+    selectedAddress: [
+        {
+            'field': 'index',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'id',
+            'title': 'Mã',
+            'width': '100px',
+            'checked': false
+
+        },
+        {
+            'field': 'name',
+            'title': 'Tên',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'parentId',
+            'title': 'Mã cha',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'location',
+            'title': 'Vị trí',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'type',
+            'title': 'Loại',
+            'width': '100px',
+            'checked': true
+        }
+    ],
     bookColumn: [
         {
             'field': 'fee',
@@ -446,6 +496,9 @@ function reducer(state = initState, action) {
                 state['disabledDetail'] = true
             else
                 state['disabledDetail'] = false
+            return state
+        case 'CHANGE_SELECTED_ADDRESS':
+            state['selectedAddress'] = action.value
             return state
         case 'CHANGE_NAVBAR':
             state['navBar'] = action.value

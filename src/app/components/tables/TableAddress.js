@@ -12,117 +12,177 @@ import {
 } from '@devexpress/dx-react-grid-material-ui';
 import { faTrashAlt, faPencilAlt, faPowerOff } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import Condition from '../../models/Condition';
 import UserService from '../../services/UserService';
 import RoleService from '../../services/RoleService';
-import { AlertCustom } from '../dialog/DialogAccount'
-import { DialogDelete } from '../dialog/DialogDelete'
-import TabPanelAccount from '../tabPanel/TabPanelAccount'
-import { DialogEditAccount } from '../dialog/DialogAccount'
-class TableAccount extends Component {
-    state = {
-        user: [],
-        role: [],
-        value: {
-            show: false,
-            message: ''
-        },
-        delete: {
+// import { DialogDelete } from '../dialog/DialogDelete'
+import { AlertCustom, DialogEditAddress } from '../dialog/DialogAddress';
+import TabPanelAddress from '../tabPanel/TabPanelAddress';
+import AddressService from '../../services/AddressService';
+import { DialogBool } from '../dialog/DialogBool';
+function TableAddress(props) {
+    let addressService = new AddressService()
+    let leftColumns = ['id', 'action', 'name']
+    let rightColumns = ['status']
+    let tableColumnExtensions = [
+        { columnName: 'id', width: 180 },
+        { columnName: 'action', width: 180 },
+        { columnName: 'name', width: 200 },
+        { columnName: 'status', width: 170 },
+    ];
+    let actionColumns = ['action']
+    let statusColumns = ['status']
+    let filteringStateColumnExtensions = [
+        { columnName: 'action', filteringEnabled: false },
+        { columnName: 'status', filteringEnabled: false },
+    ]
+    let pages = [1, 10, "id", 0]
+    let conditions = []
+    let condition = new Condition(pages, conditions)
+    let currentPage = 0
+    let setCurrentPage = 0
+    let pageSize = 4
+    let setPageSize = 4
+    let pageSizes = [4, 10, 15]
+    let [edit, setEdit] = useState({
+        open: false
+    })
+    let [data, setData] = useState({
+        show: false,
+        message: 'Tạo thành công',
+        severity: 'success'
+    })
+    let [alert, setAlert] = useState({
+        open: false,
+        message: 'Tạo thành công',
+        severity: 'success'
+    })
+    let [address, setAddress] = useState([])
+    let [selectedAddress, setSelectedAddress] = useState([])
+    let [dialogBool, setDialogBool] = useState({
+        open: false,
+        id: 0,
+        table: 10,
+        code: '',
+        action: ''
+    })
+    useEffect(() => {
+        selectedAddress = props.state.selectedAddress.reduce((array, e) => {
+            if (e.checked === true)
+                array.push(
+                    {
+                        name: e.field,
+                        title: e.title
+                    })
+            return array
+
+        }, [])
+        addressService.search(condition)
+            .then(value => {
+                let i = 0
+                address = value.result.map(e => {
+                    i += 1
+                    return {
+                        index: i,
+                        id: e.id,
+                        name: e.name,
+                        parentId: e.parentId,
+                        location: e.location,
+                        type: e.type
+                    }
+                })
+            })
+            .finally(() => {
+                setAddress(address)
+                setSelectedAddress(selectedAddress)
+            })
+    }, [])
+    let getAddress = () => {
+        return addressService.search(condition)
+            .then(value => {
+                let i = 0
+                address = value.result.map(e => {
+                    i += 1
+                    return {
+                        index: i,
+                        id: e.id,
+                        name: e.name,
+                        parentId: e.parentId,
+                        location: e.location,
+                        type: e.type
+                    }
+                })
+            })
+    }
+    let clickTrash = (e) => {
+        let id = e.currentTarget.id.split('&')[1]
+        setDialogBool({
+            open: true,
+            id: id,
+            code: '',
+            action: 'DELETE_ADDRESS'
+        })
+    }
+    let clickEdit = (e) => {
+        let id = e.currentTarget.id.split('&')[1]
+        setEdit({
+            open: true,
+            id: id
+        })
+    }
+    let close = (e) => {
+        setAlert({
             open: false,
-            name: '',
-            id: '',
-            email: ''
-        },
-        edit: {
-            open: false,
-            id: 0
-        },
-        selectedAccount: []
-    }
-    componentWillMount() {
-        this.getUser()
-        this.getRole()
-        this.loadSelected()
-    }
-    loadSelected = (event) => {
-        this.setState({
-            selectedAccount: this.props.state.selectedAccount.reduce((array, e) => {
-                if (e.checked === true)
-                    array.push(
-                        {
-                            name: e.field,
-                            title: e.title
-                        })
-                return array
-
-            }, [])
+            message: 'Tạo thành công',
+            severity: 'success'
         })
     }
-    clickTrash = (event) => {
-        let id = event.currentTarget.id.split('&')[1]
-        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
-        this.setState({
-            delete: {
-                open: true,
-                id: remove.id,
-                name: remove.name,
-                email: remove.email,
-                action: 'DELETE_USER'
-            }
-        })
-    }
+    let cancel = (e) => {
 
-    clickEdit = (event) => {
-        let id = event.currentTarget.id.split('&')[1]
-        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
-        this.setState({
-            edit: {
-                open: true,
-                id: remove.id,
-            }
-        })
+        switch (e) {
+            case 'DELETE_ADDRESS_SUCCESS':
+                setData({
+                    show: false,
+                    message: 'Xóa thành công địa chỉ',
+                    severity: 'success'
+                })
+                break;
+            case 'DELETE_ADDRESS':
+                setDialogBool({
+                    open: false,
+                })
+                break;
+            case 'UPDATE_ADDRESS':
+                setEdit({
+                    open: false,
+                })
+                break;
 
-    }
-    clickReset = (event) => {
-        let id = event.currentTarget.id.split('&')[1]
-        let remove = this.state.user.filter(e => e.id === parseInt(id))[0]
-        this.setState({
-            delete: {
-                open: true,
-                id: remove.id,
-                name: remove.name,
-                email: remove.email,
-                action: 'RESET_USER'
-            }
-        })
-    }
 
-    ActionFormatter = (value) => {
+            default:
+                break;
+        }
+    }
+    let ActionFormatter = (value) => {
         return (
             <div>
                 <button
                     id={'trash&' + value.row.id}
-                    onClick={this.clickTrash}
+                    onClick={clickTrash}
                     style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
                 <button
                     id={'edit&' + value.row.id}
-                    onClick={this.clickEdit}
+                    onClick={clickEdit}
                     style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faPencilAlt} />
-                </button>
-                <button
-                    id={'reset&' + value.row.id}
-                    onClick={this.clickReset}
-                    style={{ background: '#0090e7', color: 'white' }} className="btn btn-rounded btn-icon">
-                    <FontAwesomeIcon icon={faPowerOff} />
                 </button>
             </div>
         )
     }
-    StatusFormater = (value) => {
+    let StatusFormater = (value) => {
         switch (value.value) {
             case 0:
                 return <span style={{
@@ -146,182 +206,130 @@ class TableAccount extends Component {
 
         }
     }
-    StatusTypeProvider = props => (
+    let StatusTypeProvider = props => (
         <DataTypeProvider
-            formatterComponent={this.StatusFormater}
+            formatterComponent={StatusFormater}
             {...props}
         />
     );
 
-    ActionTypeProvider = props => (
+    let ActionTypeProvider = props => (
         <DataTypeProvider
-            formatterComponent={this.ActionFormatter}
+            formatterComponent={ActionFormatter}
             {...props}
         />
     )
-    getUser() {
-        let userService = new UserService();
-        let pages = [1, 10, "id", 0]
-        let conditions = []
-        let condition = new Condition(pages, conditions)
-        userService.search(condition).then(value => {
-            this.setState({
-                user: value.result
-            })
-        }).catch(error => {
-            console.log('aaaa');
-        })
+    let loadSelected = (event) => {
+        selectedAddress = props.state.selectedAddress.reduce((array, e) => {
+            if (e.checked === true)
+                array.push(
+                    {
+                        name: e.field,
+                        title: e.title
+                    })
+            return array
+
+        }, [])
+        setSelectedAddress(selectedAddress)
     }
-    getRole() {
-        let roleService = new RoleService();
-        let pages = [1, 10, "id", 0]
-        let conditions = []
-        let condition = new Condition(pages, conditions)
-        roleService.search(condition).then(value => {
-            this.setState({
-                role: value.result
-            })
-        }).catch(error => {
-            console.log('aaaa');
-        })
-    }
-    confirm = (event, id) => {
+    let confirm = (event) => {
         switch (event) {
-            case 'DELETE_USER_SUCCESS':
-                this.getUser()
-                this.setState({
-                    value: {
-                        show: true,
-                        message: 'Xóa người dùng thành công'
-                    },
-                    delete: {
-                        show: false
-                    }
-                })
+            case 'CREATE_ADDRESS_SUCCESS':
+                getAddress()
+                    .finally(() => {
+                        setAddress(address)
+                        setAlert({
+                            open: true,
+                            message: 'Tạo thành công địa chỉ',
+                            severity: 'success',
+                        })
+                    })
                 break;
-            case 'CREATE_USER_SUCCESS':
-                this.getUser()
-                break;
-            case 'UPDATE_USER_SUCCESS':
-                this.getUser()
-                this.setState({
-                    edit: {
-                        open: false
-                    },
-                    value: {
-                        show: true,
-                        message: 'Cập nhật người dùng thành công'
-                    }
-                })
-                break;
-            case 'RESET_USER_SUCCESS':
-                this.setState({
-                    delete: {
-                        show: false
-                    },
-                    value: {
-                        show: true,
-                        message: 'Reset mật khẩu người dùng thành công'
-                    }
-                })
+            case 'UPDATE_ADDRESS_SUCCESS':
+                getAddress()
+                    .finally(() => {
+                        setAddress(address)
+                        setEdit({
+                            open: false,
+                        })
+                        setAlert({
+                            open: true,
+                            message: 'Cập nhật thành công địa chỉ',
+                            severity: 'success',
+                        })
+                    })
+                break
+            case 'DELETE_ADDRESS_SUCCESS':
+                getAddress()
+                    .finally(() => {
+                        setAddress(address)
+                        setDialogBool({
+                            open: false,
+
+                        })
+                        setAlert({
+                            open: true,
+                            message: 'Xóa thành công địa chỉ',
+                            severity: 'success',
+                        })
+                    })
                 break;
         }
     }
-    cancel = (event) => {
-        switch (event) {
-            case 0:
-                this.setState({
-                    value: {
-                        show: false
-                    }
-                })
-                break;
-            case 'DELETE_USER':
-                this.setState({
-                    delete: {
-                        show: false
-                    }
-                })
-                break;
-            case 'RESET_USER':
-                this.setState({
-                    delete: {
-                        show: false
-                    }
-                })
-                break;
-            case 'CANCEL_USER_UPDATE':
-                this.setState({
-                    edit: {
-                        open: false
-                    }
-                })
-                break;
-            default:
-                break;
-        }
-    }
-    render() {
-        let leftColumns = ['id', 'action', 'name']
-        let rightColumns = ['status']
-        let tableColumnExtensions = [
-            { columnName: 'id', width: 180 },
-            { columnName: 'action', width: 180 },
-            { columnName: 'name', width: 200 },
-            { columnName: 'status', width: 170 },
-        ];
-        let actionColumns = ['action']
-        let statusColumns = ['status']
-        let filteringStateColumnExtensions = [
-            { columnName: 'action', filteringEnabled: false },
-            { columnName: 'status', filteringEnabled: false },
-        ]
-        let currentPage = 0
-        let setCurrentPage = 0
-        let pageSize = 4
-        let setPageSize = 4
-        let pageSizes = [4, 10, 15]
-        return (
-            <Paper>
-                <DialogEditAccount edit={this.state.edit} confirm={this.confirm} cancel={this.cancel} />
-                <AlertCustom value={this.state.value} close={this.cancel} />
-                <DialogDelete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
-                <Grid xs={12} rows={this.state.user} columns={this.state.selectedAccount} >
-                    <this.ActionTypeProvider for={actionColumns} />
-                    <this.StatusTypeProvider for={statusColumns} />
-                    <FilteringState columnExtensions={filteringStateColumnExtensions} />
-                    <IntegratedFiltering />
-                    <Table
-                    // columnExtensions={tableColumnExtensions}
-                    />
-                    <TableHeaderRow />
-                    <TableFilterRow />
-                    <TableFixedColumns
-                        leftColumns={leftColumns}
-                        rightColumns={rightColumns}
-                    />
-                    <PagingState
-                        currentPage={currentPage}
-                        onCurrentPageChange={setCurrentPage}
-                        pageSize={pageSize}
-                        onPageSizeChange={setPageSize}
-                    />
-                    <IntegratedPaging />
-                    <TableColumnVisibility />
-                    <Toolbar />
-                    <TabPanelAccount loadSelected={this.loadSelected} confirm={this.confirm} />
-                    <PagingPanel pageSizes={pageSizes} />
-                </Grid>
-            </Paper>
-        )
-    }
+    return (
+        <Paper>
+            <DialogEditAddress data={edit}
+                confirm={confirm}
+                cancel={cancel}
+            />
+            <DialogBool cancel={cancel} confirm={confirm} data={dialogBool}
+            // fail={fail} 
+            />
+            <AlertCustom data={alert}
+                close={close}
+            />
+            {/* <DialogDelete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} /> */}
+            <Grid xs={12}
+                rows={address}
+                columns={selectedAddress} >
+                <ActionTypeProvider for={actionColumns} />
+                {/* <StatusTypeProvider for={statusColumns} /> */}
+                <FilteringState columnExtensions={filteringStateColumnExtensions} />
+                <IntegratedFiltering />
+                <Table
+                // columnExtensions={tableColumnExtensions}
+                />
+                <TableHeaderRow />
+                <TableFilterRow />
+                <TableFixedColumns
+                // leftColumns={leftColumns}
+                // rightColumns={rightColumns}
+                />
+                <PagingState
+                    currentPage={currentPage}
+                    onCurrentPageChange={setCurrentPage}
+                    pageSize={pageSize}
+                    onPageSizeChange={setPageSize}
+                />
+                <IntegratedPaging />
+                <TableColumnVisibility />
+                <Toolbar />
+                <TabPanelAddress
+                    loadSelected={loadSelected}
+                    confirm={confirm}
+                />
+                <PagingPanel pageSizes={pageSizes} />
+            </Grid>
+        </Paper >
+    )
+
 }
 function select(state) {
     return {
         state: state.reducer
     }
 }
-export default connect(select)(TableAccount);
+export default connect(select)(TableAddress);
 
 
 

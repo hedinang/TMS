@@ -16,7 +16,7 @@ import StarBorder from '@material-ui/icons/StarBorder';
 import Collapse from '@material-ui/core/Collapse';
 import { connect } from 'react-redux'
 import {
-  faBars, faEnvelope, faBell, faTv, faTruckMoving, faSignOutAlt,
+  faBars, faEnvelope, faBell, faTv, faTruckMoving, faSignOutAlt, faMapMarkerAlt,
   faUser, faIdCard, faRulerVertical, faAngleDown, faAngleUp, faCog
 } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -124,7 +124,7 @@ function App() {
   const classes = useStyles()
   const theme = useTheme()
   const anchorRef = React.useRef(null)
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   let [openUser, setOpenUser] = useState(false)
   let [openNotify, setOpenNotify] = useState(false)
   let [openMessage, setOpenMessage] = useState(false)
@@ -477,6 +477,12 @@ function App() {
                 </ListItem>
               </List>
             </Collapse>
+            <ListItem button key='text' className={classes.primary} component={Link} to="/address">
+              <ListItemIcon >
+                <FontAwesomeIcon icon={faMapMarkerAlt} className='mr-2' />
+              </ListItemIcon>
+              <ListItemText primary='Địa chỉ' />
+            </ListItem>
           </List>
         </Drawer>
         <main className={classes.content}>

@@ -17,7 +17,7 @@ import Condition from '../../models/Condition';
 import UserService from '../../services/UserService';
 import RoleService from '../../services/RoleService';
 import { AlertCustom } from '../dialog/DialogAccount'
-import { DialogDelete } from '../dialog/DialogDelete'
+import { DialogBool } from '../dialog/DialogBool'
 import TabPanelAccount from '../tabPanel/TabPanelAccount'
 import { DialogEditAccount } from '../dialog/DialogAccount'
 class TableAccount extends Component {
@@ -285,7 +285,7 @@ class TableAccount extends Component {
             <Paper>
                 <DialogEditAccount edit={this.state.edit} confirm={this.confirm} cancel={this.cancel} />
                 <AlertCustom value={this.state.value} close={this.cancel} />
-                <DialogDelete cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
+                <DialogBool cancel={this.cancel} confirm={this.confirm} fail={this.fail} data={this.state.delete} />
                 <Grid xs={12} rows={this.state.user} columns={this.state.selectedAccount} >
                     <this.ActionTypeProvider for={actionColumns} />
                     <this.StatusTypeProvider for={statusColumns} />
