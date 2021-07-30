@@ -85,7 +85,6 @@ let Show = connect(select)(props => {
                 <FontAwesomeIcon icon={faAllergies} className='mr-2' />
                 Chọn tất
             </button>
-
             <div >Có {checked}/{selected.length} loại được chọn hiển thị</div>
             {/* <div >Có 1/9 loại được chọn hiển thị</div> */}
             <GridList cellHeight={50} cols={6} >
@@ -105,49 +104,6 @@ let Show = connect(select)(props => {
             </GridList>
         </div >
     );
-})
-let Create = connect(select)(props => {
-    let [data, setData] = useState({})
-    let addItem = (event) => {
-        switch (event) {
-            case 'CREATE_USER_SUCCESS':
-                data = {
-                    open: false
-                }
-                setData(data)
-                break;
-        }
-        props.confirm(event)
-    }
-    let cancel = (event) => {
-        switch (event) {
-            case 'CREATE_USER':
-                data = {
-                    open: false
-                }
-                setData(data)
-                props.cancel('CREATE_USER')
-                break;
-        }
-    }
-    useEffect(() => {
-        if (props.tab.index === 1)
-            data = {
-                open: true
-            }
-        else
-            data = {
-                open: false
-            }
-        setData(data)
-    }, [props.tab.index])
-    return (
-        <DialogCreateAddress
-            create={data}
-            confirm={addItem}
-            cancel={cancel}
-        />
-    )
 })
 function TabPanelAddress(props) {
 
@@ -284,7 +240,6 @@ function TabPanelAddress(props) {
                     </AppBar>
                     <Show value={tab} tab={tab} loadSelected={props.loadSelected} />
                     <DialogCreateAddress create={data} confirm={addItem} cancel={cancel} />
-                    {/* <Create value={tab} tab={tab} cancel={cancel} confirm={confirm} /> */}
                 </div>
             </Template>
         </Plugin>

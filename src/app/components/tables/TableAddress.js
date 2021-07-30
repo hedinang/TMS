@@ -73,7 +73,8 @@ function TableAddress(props) {
                 array.push(
                     {
                         name: e.field,
-                        title: e.title
+                        title: e.title,
+                        // checked:e.checked
                     })
             return array
 

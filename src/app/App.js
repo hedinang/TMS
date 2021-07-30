@@ -16,7 +16,7 @@ import StarBorder from '@material-ui/icons/StarBorder';
 import Collapse from '@material-ui/core/Collapse';
 import { connect } from 'react-redux'
 import {
-  faBars, faEnvelope, faBell, faTv, faTruckMoving, faSignOutAlt, faMapMarkerAlt,
+  faBars, faEnvelope, faBell, faTv, faTruckMoving, faSignOutAlt, faMapMarkerAlt, faTruck,
   faUser, faIdCard, faRulerVertical, faAngleDown, faAngleUp, faCog
 } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -446,12 +446,31 @@ function App() {
               </ListItemIcon>
               <ListItemText primary='Trang chủ' />
             </ListItem>
-            <ListItem button key='text' className={classes.primary} component={Link} to="/booking">
+            <ListItem button key='text' className={classes.primary} onClick={downClick}>
               <ListItemIcon >
-                <FontAwesomeIcon icon={faTruckMoving} className='mr-2' />
+                <FontAwesomeIcon icon={faTruck} className='mr-2' />
               </ListItemIcon>
-              <ListItemText primary='Đặt chuyến' />
+              <ListItemText primary='Vận chuyển' />
+              <ListItemIcon >
+                <UpDownAction open={downAccount} />
+              </ListItemIcon>
             </ListItem>
+            <Collapse in={downAccount} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem button className={classes.nested} component={Link} to="/booking/order">
+                  <ListItemIcon>
+                    <FontAwesomeIcon icon={faUser} className='mr-2' />
+                  </ListItemIcon>
+                  <ListItemText primary="Đơn hàng" />
+                </ListItem>
+                <ListItem button className={classes.nested} component={Link} to="/booking/order">
+                  <ListItemIcon>
+                    <FontAwesomeIcon icon={faRulerVertical} className='mr-2' />
+                  </ListItemIcon>
+                  <ListItemText primary="Chuyến hàng" />
+                </ListItem>
+              </List>
+            </Collapse>
             <ListItem button key='text' className={classes.primary} onClick={downClick}>
               <ListItemIcon >
                 <FontAwesomeIcon icon={faIdCard} className='mr-2' />

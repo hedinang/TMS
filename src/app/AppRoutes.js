@@ -1,5 +1,6 @@
 import React, { Component, Suspense, lazy } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
+import Order from './components/pages/booking/Order';
 
 import Spinner from './components/shared/Spinner';
 
@@ -50,7 +51,7 @@ class AppRoutes extends Component {
       <Suspense fallback={<Spinner />}>
         <Switch >
           <PrivateRoute access={this.props.access} path='/dashboard' component={Dashboard} />
-          <PrivateRoute access={this.props.access} path='/booking' component={Booking} />
+          <PrivateRoute access={this.props.access} path='/booking/order' component={Order} />
           <PrivateRoute access={this.props.access} path='/method/vehicle' component={Buttons} />
           <PrivateRoute access={this.props.access} path='/method/device' component={Device} />
           <PrivateRoute access={this.props.access} path='/employee/account' component={Account} />

@@ -23,7 +23,7 @@ class Account extends Component {
     return (
       <div>
         <div className="mb-2" style={{ textAlign: 'center', color: `${this.state.textColor}`, overflow: 'visible' }}>Danh sách nhân sự</div>
-        <TableAccount selected={this.state.selected} panel={'account'} height={'600px'} />
+        <TableAccount/>
       </div >
     )
   }

@@ -361,6 +361,185 @@ let initState = {
             'checked': true
         }
     ],
+    selectedOrder: [
+        {
+            'field': 'index',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'id',
+            'title': 'Mã',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'name',
+            'title': 'Tên đơn hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'weight',
+            'title': 'Tổng khối lượng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'volumeRequire',
+            'title': 'Thể tích xe',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'weightRequire',
+            'title': 'Tải trọng xe',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'isCombine',
+            'title': 'Ghép chuyến',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'isReturn',
+            'title': 'Trở về',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'maxFee',
+            'title': 'Cước trần',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'status',
+            'title': 'Trạng thái',
+            'width': '100px',
+            'checked': true
+        },
+    ],
+    selectedQuotation: [
+        {
+            'field': 'index',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'id',
+            'title': 'Mã',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'truckerId',
+            'title': 'Mã nhà vận tải',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'truckerName',
+            'title': 'Tên nhà vận tải',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'vehicleId',
+            'title': 'Mã xe',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'licensePlate',
+            'title': 'Biển số xe',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'weight',
+            'title': 'Tổng khối lượng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'volumeRequire',
+            'title': 'Thể tích xe',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'tripFee',
+            'title': 'Cước chuyến',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'waitFee',
+            'title': 'Cước đợi',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'returnFee',
+            'title': 'Cước quay về',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'loading',
+            'title': 'Cước bốc hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'unloading',
+            'title': 'Cước dỡ hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'cancel',
+            'title': 'Cước hủy',
+            'width': '100px',
+            'checked': true
+
+        }
+    ],
     bookColumn: [
         {
             'field': 'fee',
@@ -499,6 +678,12 @@ function reducer(state = initState, action) {
             return state
         case 'CHANGE_SELECTED_ADDRESS':
             state['selectedAddress'] = action.value
+            return state
+        case 'CHANGE_SELECTED_ORDER':
+            state['selectedOrder'] = action.value
+            return state
+        case 'CHANGE_SELECTED_QUOTATION':
+            state['selectedQuotation'] = action.value
             return state
         case 'CHANGE_NAVBAR':
             state['navBar'] = action.value
