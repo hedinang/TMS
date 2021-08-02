@@ -391,6 +391,62 @@ let initState = {
 
         },
         {
+            'field': 'openBid',
+            'title': 'Mở thầu',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'closeBid',
+            'title': 'Đóng thầu',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'startName',
+            'title': 'Nơi lấy',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'startLocation',
+            'title': 'Vị trí lấy',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'startEta',
+            'title': 'Thời gian lấy',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'endName',
+            'title': 'Nơi trả',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'endLocation',
+            'title': 'Vị trí trả',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'endEta',
+            'title': 'Thời gian trả',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
             'field': 'weight',
             'title': 'Tổng khối lượng',
             'width': '100px',

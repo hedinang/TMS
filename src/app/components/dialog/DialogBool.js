@@ -6,10 +6,12 @@ import RoleService from '../../services/RoleService'
 import UserService from '../../services/UserService';
 import PermissionService from '../../services/PermissionService';
 import AddressService from '../../services/AddressService';
+import OrderService from '../../services/OrderService';
 let userService = new UserService()
 let roleService = new RoleService()
 let permissionService = new PermissionService()
 let addressService = new AddressService()
+let orderService = new OrderService()
 function DialogBool(event) {
     let [title, setTitle] = useState('')
     let [open, setOpen] = useState(false)
@@ -33,7 +35,9 @@ function DialogBool(event) {
             case 'DELETE_ADDRESS':
                 title = 'Bạn có chắc chắn xóa địa chỉ có id là ' + event.data.id + ' ?'
                 break;
-
+            case 'DELETE_ORDER':
+                title = 'Bạn có chắc chắn xóa đơn hàng có id là ' + event.data.id + ' ?'
+                break;
             default:
                 break;
         }
@@ -92,6 +96,13 @@ function DialogBool(event) {
                     event.confirm('DELETE_ADDRESS_SUCCESS')
                 }).catch(error => {
                     event.fail('DELETE_PERMISSION_FAIL')
+                })
+                break;
+            case 'DELETE_ORDER':
+                orderService.delete(event.data.id).then(value => {
+                    event.confirm('DELETE_ORDER_SUCCESS')
+                }).catch(error => {
+                    event.fail('DELETE_ORDER_FAIL')
                 })
                 break;
             default:

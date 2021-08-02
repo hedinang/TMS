@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
 import { faPlusSquare, faAllergies, faEye } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { GridList, GridListTile, Checkbox } from '@material-ui/core';
-import TabPanelOrder from '../../tabPanel/TabPanelOrder';
+import { GridList, GridListTile, Checkbox } from '@material-ui/core'
+import TabPanelOrder from '../../tabPanel/TabPanelOrder'
 import { action } from '../../../redux/actions/actions'
-import { DialogCreateOrder } from '../../dialog/DialogOrder';
-
+import { DialogCreateOrder, AlertCustom } from '../../dialog/DialogOrder'
 let Show = connect(select)(props => {
     let [selectedOrder, setSelectedOrder] = useState([])
     let [selectedQuotation, setSelectedQuotation] = useState([])
@@ -15,6 +14,8 @@ let Show = connect(select)(props => {
     let [disabledOrder, setDisabledOrder] = useState(false)
     let [disabledQuotation, setDisabledQuotation] = useState(false)
     let [show, setShow] = useState('none')
+
+
     let [create, setCreate] = useState({
         open: false,
 
@@ -132,10 +133,17 @@ let Show = connect(select)(props => {
 
         props.loadSelected()
     }
+    
     let addItem = () => {
         setCreate({
             open: true
         })
+    }
+    let confirm = (event) => {
+        setCreate({
+            open: false
+        })
+        props.loadSelected(event)
     }
     let cancel = () => {
         setCreate({
@@ -169,9 +177,10 @@ let Show = connect(select)(props => {
             <div style={{ display: `${show}` }} >
                 <DialogCreateOrder
                     create={create}
-                    confirm={addItem}
+                    confirm={confirm}
                     cancel={cancel}
                 />
+
                 <button id='order&all' disabled={disabledOrder}
                     style={{
                         textAlign: 'text-top', background: '#00d25b', height: '2rem', outlineStyle: 'none', border: 'none',
@@ -228,16 +237,39 @@ let Show = connect(select)(props => {
 })
 function Order(props) {
     let [reload, setReload] = useState(false)
+    let [alert, setAlert] = useState({
+        open: false,
+        message: 'Tạo thành công',
+        severity: 'success'
+    })
     useEffect(() => {
     }, [reload])
-    let loadSelected = () => {
-        setReload(!reload)
+    let loadSelected = (event) => {
+        switch (event) {
+            case 'CREATE_ORDER_SUCCESS':
+                setAlert({
+                    open: true,
+                    message: 'Tạo thành công đơn hàng',
+                    severity: 'success',
+                })
+                setReload(!reload)
+        }
+    }
+    let close = (e) => {
+        setAlert({
+            open: false,
+            message: 'Tạo thành công',
+            severity: 'success'
+        })
     }
     return (
         <div>
             <div className="mb-2" style={{ textAlign: 'center', color: 'black', overflow: 'visible' }}>Danh sách đơn hàng</div>
             <Show loadSelected={loadSelected} />
             <TabPanelOrder reload={reload} />
+            <AlertCustom data={alert}
+                close={close}
+            />
         </div >
     )
 }
@@ -246,4 +278,4 @@ function select(state) {
         state: state.reducer
     }
 }
-export default connect(select)(Order);
+export default connect(select)(Order)

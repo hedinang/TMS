@@ -1,135 +1,304 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Snackbar, Grid, Button, DialogActions, DialogContent, Input, DialogTitle, Dialog, TextField, Slider, Grow
+    Snackbar, Grid, Button, DialogActions, DialogContent, Input, DialogTitle, Dialog, TextField, Slider, Checkbox
 } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Condition from '../../models/Condition';
 import OrderService from '../../services/OrderService';
-import { faPlusSquare, faAllergies, faEye, faMinusSquare, faTimes } from '@fortawesome/fontawesome-free-solid'
+import { faPlusSquare, faTimes } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import AddressService from '../../services/AddressService';
-import { makeStyles } from '@material-ui/core/styles';
 let pageSize = 10
-let pages = [1, pageSize, "id", 0]
+let pages = [1, pageSize, 'id', 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
-let addressService = new AddressService()
-const useStyles = makeStyles((theme) => ({
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-    textField: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
-        width: 200,
-    },
-}));
+let orderService = new OrderService()
 function DialogCreateOrder(event) {
     let [open, setOpen] = useState(false)
-    let [address, setAddress] = useState([])
     let [good, setGood] = useState([])
-    let [temperature, setTemperature] = useState([])
-    let [listAddress, setListAddress] = useState([])
-    let [addressType, setAddressType] = useState([
-        'Nơi nhận', 'Nơi giao'
-    ])
-    let [markTemperature, setMarkTemperature] = useState([
-        {
-            value: 100,
-            label: '100kg',
-        }
-    ])
-
-    const classes = useStyles()
-    let getItem = (id, array) => {
-        if (id === undefined)
-            return {}
-        let a = array.filter(e => e.id === id)[0]
-        return a
-    }
+    let [name, setName] = useState('')
+    let [openBid, setOpenBid] = useState('')
+    let [closeBid, setCloseBid] = useState('')
+    let [weight, setWeight] = useState(0)
+    let [volumn, setVolumn] = useState([{
+        label: '0m3',
+        value: 0
+    }])
+    let [weightRequire, setWeightRequire] = useState([{
+        label: '0kg',
+        value: 0
+    }])
+    let [startName, setStartName] = useState('')
+    let [startLocation, setStartLocation] = useState('')
+    let [startEta, setStartEta] = useState('')
+    let [endName, setEndName] = useState('')
+    let [endLocation, setEndLocation] = useState('')
+    let [endEta, setEndEta] = useState('')
+    let [maxFee, setMaxFee] = useState([{
+        label: '0 triệu đồng',
+        value: 0
+    }])
+    let [isReturn, setIsReturn] = useState(false)
+    let [isCombine, setIsCombine] = useState(false)
     useEffect(() => {
-        address = [
+        setName('')
+        setOpenBid('')
+        setCloseBid('')
+        setVolumn([{
+            label: '0m3',
+            value: 0
+        }])
+        setWeightRequire([{
+            label: '0kg',
+            value: 0
+        }])
+        setStartName('')
+        setStartLocation('')
+        setStartEta('')
+        setEndName('')
+        setEndLocation('')
+        setEndEta('')
+        setMaxFee([{
+            label: '0 triệu đồng',
+            value: 0
+        }])
+        setIsReturn(false)
+        setIsCombine(false)
+        setGood([
             {
                 button: true
             }
-        ]
-        good = [
-            {
-                name: 'Hải sản',
-                weight: 100,
-                button: false
-            },
-            {
-                button: true
-            }
-        ]
-        temperature = [
-            {
-                name: 'N1',
-                down: 10,
-                up: 20,
-                button: false
-            },
-            {
-                button: true
-            }
-        ]
-        addressService.search(condition)
-            .then(value => {
-                listAddress = value.result
-            })
-            .finally(() => {
-                setListAddress(listAddress)
-                setAddress(address)
-                setGood(good)
-                setTemperature(temperature)
-                setOpen(event.create.open)
-            })
+        ])
+        setOpen(event.create.open)
     }, [event.create.open])
-    let addAddress = () => {
-        address = address.map(e => {
+    let addGood = () => {
+        let i = 0
+        good = good.map(e => {
             if (e.button === true)
                 return {
+                    id: i,
                     name: '',
-                    type: '',
-                    eta: '',
+                    mark: [{
+                        value: 0,
+                        label: '0kg',
+                    }],
+                    down: [{
+                        value: 0,
+                        label: '0oC',
+                    }]
+                    ,
+                    up: [{
+                        value: 0,
+                        label: '0oC',
+                    }],
                     button: false
                 }
+            i += 1
             return e
         })
-        address.push({
+        good.push({
             button: true
         })
-        setAddress(address)
+        setGood(good)
     }
     let confirm = () => {
+
+        let goodRequest = []
+
+        for (let i = 0; i < good.length - 1; i++) {
+            goodRequest.push({
+                name: good[i].name,
+                weight: good[i].mark[0].value,
+                down: good[i].down[0].value,
+                up: good[i].up[0].value,
+            })
+        }
+        let orderRequest = {
+            name: name,
+            openBid: openBid,
+            closeBid: closeBid,
+            startName: startName,
+            startLocation: startLocation,
+            startEta: startEta,
+            endName: endName,
+            endLocation: endLocation,
+            endEta: endEta,
+            good: goodRequest,
+            weight: weight,
+            volumeRequire: volumn[0].value,
+            weightRequire: weightRequire[0].value,
+            isCombine: isCombine,
+            isReturn: isReturn,
+            maxFee: maxFee[0].value,
+        }
+        orderService.create(orderRequest).then(value => {
+            event.confirm('CREATE_ORDER_SUCCESS')
+        }).catch(error => {
+            console.log('aa');
+        })
         console.log('aaa');
+
     }
     let cancel = () => {
         event.cancel('CREATE_Order')
     }
     let changeName = (e) => {
-        console.log('aaa');
+        name = e.target.value
+        setName(name)
     }
-    let changeLocation = (e) => {
-        console.log('aaa');
+    let changeOpenBid = (e, value) => {
+        openBid = e.target.value
+        setOpenBid(openBid)
     }
-    let changeTemperature = (e, value) => {
-        setMarkTemperature([{
-            value: value,
+    let changeCloseBid = (e) => {
+        closeBid = e.target.value
+        setCloseBid(closeBid)
+    }
+    let changeVolumn = (e, value) => {
+        volumn = [{
+            label: value + 'm3',
+            value: value
+        }]
+        setVolumn(volumn)
+    }
+    let changeWeightRequire = (e, value) => {
+        weightRequire = [{
             label: value + 'kg',
-        }])
+            value: value
+        }]
+        setWeightRequire(weightRequire)
     }
-
+    let changeStartName = (e) => {
+        startName = e.target.value
+        setStartName(startName)
+    }
+    let changeStartLocation = (e) => {
+        startLocation = e.target.value
+        setStartLocation(startLocation)
+    }
+    let changeStartEta = (e) => {
+        startEta = e.target.value
+        setStartEta(startEta)
+    }
+    let changeEndName = (e) => {
+        endName = e.target.value
+        setEndName(endName)
+    }
+    let changeEndLocation = (e) => {
+        endLocation = e.target.value
+        setEndLocation(endLocation)
+    }
+    let changeEndEta = (e) => {
+        endEta = e.target.value
+        setEndEta(endEta)
+    }
+    let changeMaxFee = (e, value) => {
+        maxFee = [{
+            label: value + ' triệu đồng',
+            value: value
+        }]
+        setMaxFee(maxFee)
+    }
+    let changeDown = (value, id) => {
+        good = good.map(e => {
+            if (e.id === id) {
+                return {
+                    id: id,
+                    name: e.name,
+                    mark: e.mark,
+                    down: [{
+                        value: value,
+                        label: value + 'oC',
+                    }],
+                    up: e.up,
+                    button: false
+                }
+            }
+            return e
+        })
+        setGood(good)
+    }
+    let changeUp = (value, id) => {
+        good = good.map(e => {
+            if (e.id === id) {
+                return {
+                    id: id,
+                    name: e.name,
+                    mark: e.mark,
+                    down: e.down,
+                    up: [{
+                        value: value,
+                        label: value + 'oC',
+                    }],
+                    button: false
+                }
+            }
+            return e
+        })
+        setGood(good)
+    }
+    let changeWeight = (value, id) => {
+        weight = 0
+        good = good.map(e => {
+            if (e.id === id) {
+                weight += value
+                return {
+                    id: id,
+                    name: e.name,
+                    mark: [{
+                        value: value,
+                        label: value + 'kg',
+                    }],
+                    down: e.down,
+                    up: e.up,
+                    button: false
+                }
+            }
+            if (e.button === false)
+                weight += e.mark[0].value
+            return e
+        })
+        setWeight(weight)
+        setGood(good)
+    }
+    let changeGoodName = (value, id) => {
+        good = good.map(e => {
+            if (e.id === id) {
+                return {
+                    id: id,
+                    name: value,
+                    mark: e.mark,
+                    down: e.down,
+                    up: e.up,
+                    button: false
+                }
+            }
+            return e
+        })
+        setGood(good)
+    }
+    let changeReturn = (e) => {
+        setIsReturn(!isReturn)
+    }
+    let changeCombine = (e) => {
+        setIsCombine(!isCombine)
+    }
+    let removeGood = (id) => {
+        let array = []
+        for (let i = 0; i < good.length; i++) {
+            if (good[i].id !== id) {
+                good[i].id = i
+                array.push(good[i])
+            }
+        }
+        setGood(array)
+    }
     return (
         <Dialog
             maxWidth='none'
             open={open}
             onClose={cancel}
         >
-
             <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
                 Thêm mới
             </DialogTitle>
@@ -137,134 +306,215 @@ function DialogCreateOrder(event) {
                 <Grid container spacing={3}>
                     <Grid item xs={4}>
                         <div>Tên đơn hàng</div>
-                        <TextField
+                        <TextField value={name}
                             name="name" title='Tên' onChange={changeName} />
                     </Grid>
                     <Grid item xs={4}>
-                        <div>Tổng khối lượng</div>
+                        <div>Thời gian mở thầu</div>
                         <TextField
-                            name="username" title='Tên' onChange={changeLocation} />
+                            onChange={changeOpenBid}
+                            value={openBid}
+                            id="datetime-local"
+                            type="datetime-local"
+
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Thời gian đóng thầu</div>
+                        <TextField
+                            onChange={changeCloseBid}
+                            value={closeBid}
+                            id="datetime-local"
+                            type="datetime-local"
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Tổng khối lượng(kg)</div>
+                        <TextField
+                            value={weight}
+                            InputProps={{ disableUnderline: true }}
+                            name="username" title='Tên' />
                     </Grid>
                     <Grid item xs={4}>
                         <div>Thể tích xe yêu cầu</div>
-                        <TextField
-                            name="name" title='Tên' onChange={changeName} />
+                        <Slider
+                            value={volumn[0].value}
+                            onChange={changeVolumn}
+                            style={{ width: '10rem', }}
+                            max={100}
+                            defaultValue={0}
+                            step={10}
+                            marks={volumn}
+                        />
                     </Grid>
                     <Grid item xs={4}>
                         <div>Tải trọng xe yêu cầu</div>
+                        <Slider
+                            value={weightRequire[0].value}
+                            onChange={changeWeightRequire}
+                            style={{ width: '10rem', }}
+                            max={100}
+                            defaultValue={0}
+                            step={10}
+                            marks={weightRequire}
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Nơi lấy</div>
+                        <TextField value={startName}
+                            name="name" title='Tên' onChange={changeStartName} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Vị trí lấy</div>
+                        <TextField value={startLocation}
+                            name="username" title='Tên' onChange={changeStartLocation} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Thời gian lấy</div>
                         <TextField
-                            name="username" title='Tên' onChange={changeLocation} />
+                            value={startEta} onChange={changeStartEta}
+                            id="datetime-local"
+                            type="datetime-local"
+                        />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Nơi trả</div>
+                        <TextField value={endName}
+                            name="name" title='Tên' onChange={changeEndName} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Vị trí trả</div>
+                        <TextField value={endLocation}
+                            name="username" title='Tên' onChange={changeEndLocation} />
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div>Thời gian trả</div>
+                        <TextField
+                            value={endEta} onChange={changeEndEta}
+                            id="datetime-local"
+                            type="datetime-local"
+                        />
+                    </Grid>
+                    <Grid item xs={4} container spacing={2}>
+                        <Grid item >Ghép chuyến</Grid>
+                        <Grid item ><Checkbox checked={isReturn}
+                            onClick={changeReturn}
+                        /></Grid>
+
+
+                    </Grid>
+                    <Grid item xs={4}>
+                        <div style={{ float: 'left' }}>Xe trở về</div>
+                        <Checkbox style={{ float: 'left' }} value={isCombine}
+                            onClick={changeCombine}
+                        />
                     </Grid>
                     <Grid item xs={4}>
                         <div>Cước trần</div>
-                        <TextField
-                            name="name" title='Tên' onChange={changeName} />
+                        <Slider
+                            value={maxFee[0].value}
+                            onChange={changeMaxFee}
+                            style={{ width: '10rem', }}
+                            max={100}
+                            defaultValue={0}
+                            step={1}
+                            marks={maxFee}
+                        />
                     </Grid>
                 </Grid>
-                <Grid container >
-                    <Grid item xs={6}>
-                        <div>Nơi nhận hàng</div>
-                        {address.map(e => {
-                            if (e.button === true)
-                                return <button
-                                    style={{
-                                        textAlign: 'text-top', background: '#00d25b', height: '2rem', outlineStyle: 'none', border: 'none',
-                                        color: 'white', width: '10rem', borderRadius: '5px', marginTop: '5px'
-                                    }}
-                                    onClick={addAddress}
-                                >
-                                    <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
-                            + Thêm địa chỉ
-                            </button>
-                            else {
-                                return <div>
-                                    <TextField style={{ width: '10rem', }}
-                                        name="name" title='Tên' placeholder='Tên' />
-                                   -
-                                    <TextField style={{ width: '15rem', }}
-                                        name="name" title='Tên' placeholder='Vị trí' />
-                                    -
-                                    <TextField
-                                        style={{ width: '14rem', }}
-                                        id="datetime-local"
-                                        type="datetime-local"
-                                        placeholder='Thời gian'
-                                        className={classes.textField}
-
-                                    />
-
-                                        -<Autocomplete
-                                        // onChange={changeParent}
-                                        defaultValue={e}
-                                        options={addressType}
-                                        getOptionLabel={option => option}
-                                        style={{ width: '8rem', display: 'inline-block' }}
-                                        renderInput={(params) => <TextField placeholder='Loại' {...params} />}
-                                    />
-                                    <button
-                                        style={{
-                                            outlineStyle: 'none', border: 'none',
-                                            color: 'red', borderRadius: '5px'
-                                        }}
-                                    >
-                                        <FontAwesomeIcon icon={faTimes} className='mr-3' />
-                                    </button>
-                                </div>
-
-                            }
-                        })}
-                    </Grid>
-                    <Grid item xs={3}>
-                        <div>Chi tiết hàng</div>
+                <Grid container spacing={2} style={{ marginTop: '2rem' }}>
+                    <Grid item xs={12} style={{ border: '2px solid #c1c1c1', borderRadius: '5px' }}>
+                        <div style={{ textAlign: 'center' }}>Chi tiết hàng</div>
                         {good.map(e => {
                             if (e.button === true)
-                                return <button
-                                    style={{
-                                        textAlign: 'text-top', background: '#00d25b', height: '2rem', outlineStyle: 'none', border: 'none',
-                                        color: 'white', width: '9rem', borderRadius: '5px', marginTop: '5px'
-                                    }}
-                                >
-                                    <FontAwesomeIcon icon={faPlusSquare}/>
-                        + Thêm hàng
-                        </button>
-                            else
+                                return <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                    <button
+                                        style={{
+                                            textAlign: 'center', background: '#00d25b', height: '2rem', outlineStyle: 'none', border: 'none',
+                                            color: 'white', width: '10rem', borderRadius: '5px', marginTop: '5px'
+                                        }}
+                                        onClick={addGood}
+                                    >
+                                        <FontAwesomeIcon icon={faPlusSquare} className='mr-2' />
+                            + Thêm hàng
+                            </button>
+                                </div>
+                            else {
                                 return <div>
                                     <Grid container>
-                                        <Grid item xs={2}>
-                                            <TextField style={{ width: '8rem', }}
+                                        <Grid item xs={1}>
+                                            <TextField style={{ width: '16rem', }} value={e.name} onChange={(event, value) => {
+                                                changeGoodName(event.target.value, e.id)
+                                            }}
                                                 name="name" title='Tên' placeholder='Tên' />
                                         </Grid>
-                                        <Grid item xs={2}></Grid>
-                                        <Grid item xs={5}>
-                                            <Slider
-                                                onChange={changeTemperature}
-                                                style={{ width: '10rem', }}
-                                                max={100}
-                                                defaultValue={100}
-                                                step={10}
-                                                marks={markTemperature}
-                                            />
+                                        <Grid item xs={1}></Grid>
+                                        <Grid item xs={3} container spacing={2}>
+                                            <Grid item>Khối lượng</Grid>
+                                            <Grid item>
+                                                <Slider
+                                                    value={e.mark[0].value}
+                                                    onChange={(event, value) => {
+                                                        changeWeight(value, e.id)
+                                                    }}
+                                                    style={{ width: '10rem', }}
+                                                    max={100}
+                                                    defaultValue={100}
+                                                    step={10}
+                                                    marks={e.mark}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={3}>
-                                            <button style={{ outlineStyle: 'none', border: 'none', color: 'red' }}>
-                                                <FontAwesomeIcon icon={faTimes}/>
+                                        <Grid item xs={3} container spacing={2}>
+                                            <Grid item>Ngưỡng dưới</Grid>
+                                            <Grid item>
+                                                <Slider
+                                                    value={e.down[0].value}
+                                                    onChange={(event, value) => {
+                                                        changeDown(value, e.id)
+                                                    }}
+                                                    style={{ width: '10rem', }}
+                                                    max={100}
+                                                    defaultValue={e.down[0].value}
+                                                    step={10}
+                                                    marks={e.down}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                        <Grid item xs={3} container spacing={2}>
+                                            <Grid item>Ngưỡng trên</Grid>
+                                            <Grid item>
+                                                <Slider
+                                                    value={e.up[0].value}
+                                                    onChange={(event, value) => {
+                                                        changeUp(value, e.id)
+                                                    }}
+                                                    style={{ width: '10rem', }}
+                                                    max={100}
+                                                    defaultValue={e.up[0].value}
+                                                    step={10}
+                                                    marks={e.up}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                        <Grid item xs={1}>
+                                            <button onClick={() => {
+                                                removeGood(e.id)
+                                            }} style={{ outlineStyle: 'none', border: 'none', color: 'red' }}>
+                                                <FontAwesomeIcon icon={faTimes} />
                                             </button>
                                         </Grid>
                                     </Grid>
-
-
-
-                                    {/* <TextField style={{ width: '8rem', }}
-                                        name="name" title='Tên' placeholder='Khối lượng' /> */}
-
                                 </div>
+                            }
                         })}
                     </Grid>
-                    <Grid item xs={3}>
-                        <div>Nhiệt độ yêu cầu</div>
+                    {/* <Grid item xs={6} style={{ border: '2px solid #c1c1c1', borderRadius: '5px', borderLeft: 'none' }}>
+                        <div style={{ textAlign: 'center' }}>Nhiệt độ yêu cầu</div>
                         {temperature.map(e => {
                             if (e.button === true)
                                 return <button
+                                    onClick={addTemperature}
                                     style={{
                                         textAlign: 'text-top', background: '#00d25b', height: '2rem', outlineStyle: 'none', border: 'none',
                                         color: 'white', width: '10rem', borderRadius: '5px', marginTop: '5px'
@@ -277,57 +527,55 @@ function DialogCreateOrder(event) {
                                 return (
                                     <Grid container>
                                         <Grid item xs={2}>
-                                            <TextField style={{ width: '5rem', }}
+                                            <TextField style={{ width: '5rem', }} value={e.name}
                                                 name="name" title='Tên' placeholder='Tên' />
                                         </Grid>
-                                        <Grid item xs={1}></Grid>
-                                        <Grid item xs={3}>
-                                            <Slider
-                                                onChange={changeTemperature}
-                                                style={{ width: '5rem', }}
-                                                max={100}
-                                                defaultValue={100}
-                                                step={10}
-                                                marks={markTemperature}
-                                            />
+
+                                        <Grid item xs={4} container spacing={2}>
+                                            <Grid item>Ngưỡng dưới</Grid>
+                                            <Grid item>
+                                                <Slider
+                                                    value={e.down[0].value}
+                                                    onChange={(event, value) => {
+                                                        changeDown(value, e.id)
+                                                    }}
+                                                    style={{ width: '8rem', }}
+                                                    max={100}
+                                                    defaultValue={e.down[0].value}
+                                                    step={10}
+                                                    marks={e.down}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={1}></Grid>
-                                        <Grid item xs={3}>
-                                            <Slider
-                                                onChange={changeTemperature}
-                                                style={{ width: '5rem', }}
-                                                max={100}
-                                                defaultValue={100}
-                                                step={10}
-                                                marks={markTemperature}
-                                            />
+
+                                        <Grid item xs={4} container spacing={2}>
+                                            <Grid item>Ngưỡng trên</Grid>
+                                            <Grid item>
+                                                <Slider
+                                                    value={e.up[0].value}
+                                                    onChange={(event, value) => {
+                                                        changeUp(value, e.id)
+                                                    }}
+                                                    style={{ width: '8rem', }}
+                                                    max={100}
+                                                    defaultValue={e.up[0].value}
+                                                    step={10}
+                                                    marks={e.up}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={1}>
-                                            <button style={{ outlineStyle: 'none', border: 'none', color: 'red' }}>
+                                        <Grid item xs={2}>
+                                            <button onClick={() => {
+                                                removeTemperature(e.id)
+                                            }}
+                                                style={{ outlineStyle: 'none', border: 'none', color: 'red' }}>
                                                 <FontAwesomeIcon icon={faTimes} />
                                             </button>
                                         </Grid>
                                     </Grid>
                                 )
-
-
-
-
-                            // <div>
-                            //     <TextField style={{ width: '5rem' }} name="name" title='Tên' placeholder='Tên' />từ
-                            // <TextField style={{ width: '7rem' }} name="name" title='Tên' placeholder='Ngưỡng dưới' /> đến
-                            // <TextField style={{ width: '7rem' }} name="name" title='Tên' placeholder='Ngưỡng trên' />
-                            //     <button
-                            //         style={{
-                            //             outlineStyle: 'none', border: 'none',
-                            //             color: 'red', borderRadius: '5px'
-                            //         }}
-                            //     >
-                            //         <FontAwesomeIcon icon={faTimes} className='mr-3' />
-                            //     </button>
-                            // </div>
                         })}
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </DialogContent>
             <DialogActions>
@@ -379,13 +627,13 @@ function DialogEditOrder(event) {
     }, [event.data.open])
     let confirm = () => {
         OrderService.update(Order.id, Order).then(value => {
-            event.confirm('UPDATE_Order_SUCCESS')
+            event.confirm('UPDATE_ORDER_SUCCESS')
         }).catch(error => {
             event.fail(1)
         })
     }
     let cancel = () => {
-        event.cancel('UPDATE_Order')
+        event.cancel('UPDATE_ORDER')
     }
     let changeName = (e) => {
         Order.name = e.target.value

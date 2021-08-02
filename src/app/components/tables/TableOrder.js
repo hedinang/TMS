@@ -7,6 +7,9 @@ import { IntegratedPaging, PagingState, DataTypeProvider } from '@devexpress/dx-
 import { Grid, PagingPanel, Table, TableHeaderRow, TableFixedColumns } from '@devexpress/dx-react-grid-material-ui'
 import Condition from '../../models/Condition';
 import OrderService from '../../services/OrderService';
+
+import { DialogBool } from '../dialog/DialogBool';
+import { AlertCustom } from '../dialog/DialogOrder';
 let orderService = new OrderService()
 function TemperatureTable(props) {
     let [selectedTemperature, setSelectedTemperature] = useState([])
@@ -66,6 +69,12 @@ function TemperatureTable(props) {
 function GoodTable(props) {
     let [selectedGood, setSelectedGood] = useState([])
     let [good, setGood] = useState([])
+    let tableColumnExtensions = [
+        { columnName: 'name', width: '8rem' },
+        { columnName: 'weight', width: '8rem' },
+        { columnName: 'down', width: '10rem' },
+        { columnName: 'up', width: '8rem' }]
+
     useEffect(() => {
         selectedGood = [
             {
@@ -74,7 +83,15 @@ function GoodTable(props) {
             },
             {
                 'name': 'weight',
-                'title': 'Khối lượng',
+                'title': 'Khối lượng(kg)',
+            },
+            {
+                'name': 'down',
+                'title': 'Ngưỡng dưới(oC)',
+            },
+            {
+                'name': 'up',
+                'title': 'Ngưỡng trên(oC)',
             }]
         setSelectedGood(selectedGood)
         if (props.orderId !== 0) {
@@ -84,6 +101,8 @@ function GoodTable(props) {
                         return {
                             name: e.name,
                             weight: e.weight,
+                            down: e.down,
+                            up: e.up
                         }
                     })
                 })
@@ -103,7 +122,7 @@ function GoodTable(props) {
                         columns={selectedGood}
                     >
                         <Table
-                        // columnExtensions={tableColumnExtensions}
+                            columnExtensions={tableColumnExtensions}
                         />
                         <TableHeaderRow />
                     </Grid>
@@ -359,6 +378,11 @@ function OrderTable(props) {
     let condition = new Condition(pages, conditions)
     let [selectedOrder, setSelectedOrder] = useState([])
     let [order, setOrder] = useState([])
+    let [alert, setAlert] = useState({
+        open: false,
+        message: 'Tạo thành công',
+        severity: 'success'
+    })
     let tableColumnExtensions = [
         { columnName: 'index', width: '4rem' },
         { columnName: 'action', width: '10rem' },
@@ -372,6 +396,17 @@ function OrderTable(props) {
         { columnName: 'maxFee', width: '6rem' },
         { columnName: 'status', width: '6rem' },
     ]
+    let [dialogBool, setDialogBool] = useState({
+        open: false,
+        id: 0,
+        table: 10,
+        code: '',
+        action: ''
+    })
+
+    let [edit, setEdit] = useState({
+        open: false
+    })
     let orderService = new OrderService()
     useEffect(() => {
         selectedOrder = props.state.selectedOrder.reduce((array, e) => {
@@ -393,13 +428,22 @@ function OrderTable(props) {
                         index: i,
                         id: e.id,
                         name: e.name,
+                        openBid: e.openBid,
+                        closeBid: e.closeBid,
+                        startName: e.startName,
+                        startLocation: e.startLocation,
+                        startEta: e.startEta,
+                        endName: e.endName,
+                        endLocation: e.endLocation,
+                        endEta: e.endEta,
                         weight: e.weight,
                         volumeRequire: e.volumeRequire,
                         weightRequire: e.weightRequire,
                         isCombine: e.isCombine,
                         isReturn: e.isReturn,
                         maxFee: e.maxFee,
-                        status: e.status
+                        // status: e.status
+                        status: 0
                     }
                 })
             })
@@ -410,8 +454,46 @@ function OrderTable(props) {
                 setSelectedOrder(selectedOrder)
             })
     }, [props.reload])
-    let clickTrash = (event) => {
-
+    let getOrder = () => {
+        return orderService.search(condition)
+            .then(value => {
+                let i = 0
+                order = value.result.map(e => {
+                    i += 1
+                    return {
+                        index: i,
+                        id: e.id,
+                        name: e.name,
+                        openBid: e.openBid,
+                        closeBid: e.closeBid,
+                        startName: e.startName,
+                        startLocation: e.startLocation,
+                        startEta: e.startEta,
+                        endName: e.endName,
+                        endLocation: e.endLocation,
+                        endEta: e.endEta,
+                        weight: e.weight,
+                        volumeRequire: e.volumeRequire,
+                        weightRequire: e.weightRequire,
+                        isCombine: e.isCombine,
+                        isReturn: e.isReturn,
+                        maxFee: e.maxFee,
+                        // status: e.status
+                        status: 0
+                    }
+                })
+            })
+            .catch(error => {
+                console.log('aaa');
+            })
+    }
+    let clickTrash = (id) => {
+        setDialogBool({
+            open: true,
+            id: id,
+            code: '',
+            action: 'DELETE_ORDER'
+        })
     }
     let clickEdit = event => {
 
@@ -420,7 +502,69 @@ function OrderTable(props) {
         let id = parseInt(event.currentTarget.id.split('&')[1])
         props.view(id)
     }
+    let confirm = (event) => {
+        switch (event) {
+            case 'DELETE_ORDER_SUCCESS':
+                getOrder()
+                    .finally(() => {
+                        setOrder(order)
+                        setDialogBool({
+                            open: false,
+                        })
+                        setAlert({
+                            open: true,
+                            message: 'Xóa thành công đơn hàng',
+                            severity: 'success',
+                        })
 
+                    })
+                break;
+        }
+    }
+
+    let cancel = (e) => {
+        switch (e) {
+            case 'DELETE_ADDRESS_SUCCESS':
+                console.log('aaa');
+                break;
+            case 'DELETE_ADDRESS':
+                setDialogBool({
+                    open: false,
+                })
+                break;
+            case 'UPDATE_ADDRESS':
+                setEdit({
+                    open: false,
+                })
+                break;
+
+
+            default:
+                break;
+        }
+    }
+    let close = (e) => {
+        setAlert({
+            open: false,
+            message: 'Tạo thành công',
+            severity: 'success'
+        })
+    }
+    let TimeFormatter = (value) => {
+        let date = new Date(value.value)
+        return date.getHours() +
+            'h ' +
+            date.getDate() +
+            "/" + (date.getMonth() + 1) +
+            "/" + date.getFullYear()
+
+    }
+    let TimeTypeProvider = props => (
+        <DataTypeProvider
+            formatterComponent={TimeFormatter}
+            {...props}
+        />
+    )
     let StatusFormatter = (value) => {
         switch (value.column.name) {
             case 'status':
@@ -486,7 +630,9 @@ function OrderTable(props) {
             <div>
                 <button
                     id={'trash&' + value.row.id}
-                    onClick={clickTrash}
+                    onClick={() => {
+                        clickTrash(value.row.id)
+                    }}
                     style={{ background: '#fc424a', color: 'white' }} className="btn btn-rounded btn-icon">
                     <FontAwesomeIcon icon={faTrashAlt} />
                 </button>
@@ -515,6 +661,10 @@ function OrderTable(props) {
         return (
             <div className='row'>
                 <Paper className='col-12' style={{ borderLeft: 'solid 1px', borderColor: '#c1c1c1' }}>
+                    <DialogBool cancel={cancel} confirm={confirm} data={dialogBool} />
+                    <AlertCustom data={alert}
+                        close={close}
+                    />
                     <Grid
                         rows={order}
                         columns={selectedOrder}
@@ -524,6 +674,8 @@ function OrderTable(props) {
                         />
                         < ActionTypeProvider
                             for={['action']}
+                        />
+                        <TimeTypeProvider for={['openBid', 'closeBid', 'startEta', 'endEta']}
                         />
                         <Table
                             columnExtensions={tableColumnExtensions}

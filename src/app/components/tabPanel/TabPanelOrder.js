@@ -9,7 +9,7 @@ import {
 
 import Condition from '../../models/Condition';
 import { TableOrder, TableQuotation, TableGood, TableReceive, TableTemperature } from '../tables/TableOrder';
-
+import { AlertCustom } from '../dialog/DialogOrder';
 let pages = [1, 10, "id", 0]
 let conditions = []
 let condition = new Condition(pages, conditions)
@@ -91,23 +91,23 @@ function TabPanelOrder(props) {
                         style={{ background: 'white' }}
                         value={col.tabRight}
                         onChange={changeTabRight} >
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
+                        {/* <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
                             <FontAwesomeIcon icon={faMapMarkerAlt} className='mr-2' />
                             <span>Nơi nhận hàng</span>
-                        </div>} />
+                        </div>} /> */}
                         <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
                             <FontAwesomeIcon icon={faInfoCircle} className='mr-2' />
-                            <span>Chi tiết hàng</span>
+                            <span>Chi tiết đơn hàng</span>
                         </div>} />
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
+                        {/* <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
                             <FontAwesomeIcon icon={faThermometerHalf} className='mr-2' />
                             <span>Nhiệt độ yêu cầu</span>
-                        </div>} />
+                        </div>} /> */}
                     </Tabs>
                 </AppBar>
-                <TableReceive value={col.tabRight} index={0} orderId={orderId} />
-                <TableGood value={col.tabRight} index={1} orderId={orderId} />
-                <TableTemperature value={col.tabRight} index={2} orderId={orderId} />
+                {/* <TableReceive value={col.tabRight} index={0} orderId={orderId} /> */}
+                <TableGood value={col.tabRight} index={0} orderId={orderId} />
+                {/* <TableTemperature value={col.tabRight} index={1} orderId={orderId} /> */}
 
             </div>
         </div>

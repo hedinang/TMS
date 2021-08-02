@@ -57,8 +57,8 @@ export default class OrderService {
                 return Promise.reject(error);
             })
     }
-    create(OrderRequest) {
-        return AxiosClient.post('/order-detail', OrderRequest, {
+    create(orderRequest) {
+        return AxiosClient.post('/order-detail', orderRequest, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -71,8 +71,8 @@ export default class OrderService {
                 return Promise.reject(error);
             })
     }
-    update(id, OrderRequest) {
-        return AxiosClient.put('/order-detail/' + id, OrderRequest, {
+    update(id, orderRequest) {
+        return AxiosClient.put('/order-detail/' + id, orderRequest, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
