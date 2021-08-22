@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import StarBorder from '@material-ui/icons/StarBorder';
-import Collapse from '@material-ui/core/Collapse';
+import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux'
 import {
-  faBars, faEnvelope, faBell, faTv, faTruckMoving, faSignOutAlt, faMapMarkerAlt, faTruck,
-  faUser, faIdCard, faRulerVertical, faAngleDown, faAngleUp, faCog
+  faBars, faEnvelope, faBell, faTv, faSignOutAlt, faMapMarkerAlt, faTruck, faUsers,
+  faUser, faStickyNote, faTrashAlt, faCog, faBalanceScale, faTasks, faCheck, faMoneyBillAlt
 } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AppRoutes from './AppRoutes'
-import { InputBase, MenuItem, TextField, MenuList, ClickAwayListener, Grow, Paper, Button, Popper } from '@material-ui/core';
-import Sidebar from './components/shared/Sidebar';
+import {
+  InputBase, MenuItem, TextField, MenuList, ClickAwayListener, Grow, Paper, Button, Popper,
+  ListItemIcon, ListItemText, ListItem, List, Toolbar, AppBar, Drawer
+} from '@material-ui/core';
 import { Link } from "react-router-dom";
 import CookieService from './services/CookieService';
+import EventSource from 'eventsource';
+import NotificationService from './services/NotificationService';
+import Condition from './models/Condition';
+import UserService from './services/UserService';
+import GroupService from './services/GroupService';
 const drawerWidth = 220
+let notificationService = new NotificationService()
+let userService = new UserService()
+let groupService = new GroupService()
+let cookieService = new CookieService()
+let userId = parseInt(cookieService.read('userId'))
+let userName = cookieService.read('userName')
+let avatar = cookieService.read('avatar')
+let role = cookieService.read('role')
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -80,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: 'hidden',
+
     width: theme.spacing(7) + 1,
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing(9) + 1,
@@ -92,7 +94,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
   content: {
@@ -104,33 +105,257 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '1600px'
   },
   nested: {
-    paddingLeft: theme.spacing(4)
+    paddingLeft: theme.spacing(7)
   },
   primary: {
     paddingLeft: theme.spacing(3.4)
   }
 }))
-function UpDownAction(event) {
-  let [open, setOpen] = useState(false)
+
+function NotifyItem(props) {
+  let removeInvitation = () => {
+    notificationService.delete(props.data.id)
+      .finally(() => {
+        props.processNotify()
+      })
+  }
+  let acceptInvitation = () => {
+    let request = {
+      notificationId: props.data.id,
+      userId: props.data.userId,
+      groupId: props.data.groupId,
+    }
+    groupService.acceptJoin(request)
+      .finally(() => {
+        props.acceptJoin()
+      })
+  }
+  switch (props.data.type) {
+    case 0:
+      return <MenuItem
+        style={{ width: '24rem' }}>
+        {/* <div className="ml-2" style={{ width: '16rem' }}>
+          <div title={props.data.content} style={{ fontSize: '15px', textOverflow: 'ellipsis', overflow: 'hidden' }}>{props.data.content}</div>
+        </div> */}
+        <Link to="/group" className="btn btn-primary">{props.data.content}</Link>
+      </MenuItem>
+    case 1:// notification la loi moi gia nhap nh
+      return <MenuItem
+        style={{ width: '24rem' }}>
+        <div className="ml-2" style={{ width: '16rem' }}>
+          <div title={props.data.content} style={{ fontSize: '15px', textOverflow: 'ellipsis', overflow: 'hidden' }}>{props.data.content}</div>
+        </div>
+        <div className="ml-2">
+          <button
+            onClick={removeInvitation}
+            style={{ background: '#fc424a', color: 'white', width: '3rem', height: '1.5rem' }} className="btn btn-rounded btn-icon">
+            <FontAwesomeIcon icon={faTrashAlt} style={{ fontSize: '1rem', marginBottom: '5px' }} />
+          </button>
+        </div>
+
+        <Link to='/group'
+          onClick={acceptInvitation}
+          style={{ background: '#00d25b', color: 'white', width: '3rem', height: '1.5rem', textAlign: 'center' }}
+          className="btn btn-rounded btn-icon">
+          <FontAwesomeIcon icon={faCheck} style={{ fontSize: '1rem', marginBottom: '5px' }} />
+        </Link>
+
+      </MenuItem>
+    case 2:
+      return <MenuItem
+        style={{ width: '24rem' }}>
+        <div className="ml-2" style={{ width: '16rem' }}>
+          <div title={props.data.content} style={{ fontSize: '15px', textOverflow: 'ellipsis', overflow: 'hidden' }}>{props.data.content}</div>
+        </div>
+      </MenuItem>
+    default:
+      break;
+  }
+}
+function Notification(props) {
+  let [notificationWait, setNotificationWait] = useState({
+    show: 'none',
+    count: 0
+  })
   useEffect(() => {
-    setOpen(event.open)
-  }, [event.open])
-  if (open)
-    return <FontAwesomeIcon icon={faAngleUp} className='mr-2' style={{ marginLeft: 'auto' }} />
-  return <FontAwesomeIcon icon={faAngleDown} className='mr-2' style={{ marginLeft: 'auto' }} />
+    if (props.access === true) {
+      let eventSource = new EventSource('http://localhost:8090/tms/notification/sse/' + props.userId, {
+        headers: {
+          Authorization: 'Bearer ' + new CookieService().read('token')
+        }
+      })
+      eventSource.onmessage = (event) => {
+        let count = parseInt(event.data)
+        let notificationWait
+        if (count === 0) notificationWait = { show: 'none', count: 0 }
+        else if (count > 0 && count < 100) notificationWait = { show: 'inline', count: event.data }
+        else notificationWait = { show: 'inline', count: '99+' }
+        setNotificationWait(notificationWait)
+      }
+    }
+  }, [props.access])
+  let toggleNotify = () => {
+    if (notificationWait.count !== 0) {
+      userService.updateNotification(props.userId, true)
+    }
+    props.toggleNotify()
+  }
+  return <Button
+    style={{ outlineStyle: 'none', fontSize: '1.1rem' }} ref={null}
+    onClick={toggleNotify}
+  >
+    <FontAwesomeIcon icon={faBell} />
+    <div className="count bg-success"
+      style={{
+        fontSize: '15px', color: 'white', borderRadius: '50%', display: notificationWait.show,
+        width: '24px', height: '24px', marginBottom: '20px'
+      }}
+    >{notificationWait.count}</div>
+  </Button>
+}
+function SideBar(props) {
+  let [link, setLink] = useState('false')
+  const classes = useStyles()
+  let changeLink = (event) => {
+    setLink(event)
+  }
+  switch (props.role) {
+    case 'Root':
+      return <List>
+        <ListItem button className={classes.primary} component={Link} to="/dashboard" onClick={() => {
+          changeLink('/dashboard')
+        }}>
+          <ListItemIcon >
+            <FontAwesomeIcon icon={faTv} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary='Trang chủ' />
+        </ListItem>
+        {/* <ListItem button className={classes.primary} component={Link} to="/order" onClick={() => {
+          changeLink('/order')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faStickyNote} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Đơn hàng" />
+        </ListItem> */}
+        <ListItem button className={classes.primary} component={Link} to="/truck-group" onClick={() => {
+          changeLink('/truck-group')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faBalanceScale} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Nhà thầu" />
+        </ListItem>
+        <ListItem button className={classes.primary} component={Link} to="/trip" onClick={() => {
+          changeLink('/trip')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faTruck} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Chuyến hàng" />
+        </ListItem>
+        <ListItem button className={classes.primary} component={Link} to="/account" onClick={() => {
+          changeLink('/account')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faUser} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Tài khoản" />
+        </ListItem>
+        <ListItem button className={classes.primary} component={Link} to="/role" onClick={() => {
+          changeLink('/role')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faTasks} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Quyền hạn" />
+        </ListItem>
+        <ListItem button className={classes.primary} component={Link} to="/address" onClick={() => {
+          changeLink('/address')
+        }}>
+          <ListItemIcon >
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary='Địa chỉ' />
+        </ListItem>
+      </List>
+    case 'Trucker':
+      return <List>
+        <ListItem button className={classes.primary} component={Link} to="/dashboard" onClick={() => {
+          changeLink('/dashboard')
+        }}>
+          <ListItemIcon >
+            <FontAwesomeIcon icon={faTv} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary='Trang chủ' />
+        </ListItem>
+        {/* <ListItem button className={classes.primary} component={Link} to="/order" onClick={() => {
+          changeLink('/order')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faStickyNote} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Đơn hàng" />
+        </ListItem> */}
+        <ListItem button className={classes.primary} component={Link} to="/quotation" onClick={() => {
+          changeLink('/quotation')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faMoneyBillAlt} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Báo giá" />
+        </ListItem>
+        {/* <ListItem button className={classes.primary} component={Link} to="/account" onClick={() => {
+          changeLink('/account')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faUser} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Tài khoản" />
+        </ListItem> */}
+        <ListItem button className={classes.primary} component={Link} to='/group' onClick={() => {
+          changeLink('/group')
+        }}>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faUsers} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary="Hội nhóm" />
+        </ListItem>
+        <ListItem button className={classes.primary} component={Link} to="/address" onClick={() => {
+          changeLink('/address')
+        }}>
+          <ListItemIcon >
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='mr-2' />
+          </ListItemIcon>
+          <ListItemText primary='Địa chỉ' />
+        </ListItem>
+      </List>
+    default:
+      return null
+  }
+
+
+
 }
 
 function App() {
   const classes = useStyles()
-  const theme = useTheme()
   const anchorRef = React.useRef(null)
   const [open, setOpen] = useState(true)
   let [openUser, setOpenUser] = useState(false)
   let [openNotify, setOpenNotify] = useState(false)
   let [openMessage, setOpenMessage] = useState(false)
-  let [downAccount, setDowAccount] = useState(false)
-  let cookieService = new CookieService()
+  let [notification, setNotification] = useState([])
+  let [access, setAccess] = useState(false)
+  let [link, setLink] = useState(window.location.pathname)
 
+  let pages = [1, 10, "id", 0]
+  let conditions = [{
+    key: 'userId',
+    operation: 0,
+    value: userId
+  }]
+  let condition = new Condition(pages, conditions)
   let handleListKeyDown = (event) => {
     if (event.key === 'Tab') {
       event.preventDefault();
@@ -139,50 +364,75 @@ function App() {
   }
   const handleDrawerOpen = () => {
     setOpen(true);
-  };
-
+  }
   const handleDrawerClose = () => {
     setOpen(false);
-  };
-  let status = [
-    { id: 0, name: 'Đang chờ' },
-    { id: 1, name: 'Đang khóa' },
-    { id: 2, name: 'Đã kích hoạt' }
-  ]
+  }
   let closeMessage = event => {
     setOpenMessage(false)
   }
   let closeNotify = event => {
     setOpenNotify(false)
   }
+  let processNotify = event => {
+    notificationService.search(condition).then(value => {
+      setNotification(value.result)
+    })
+  }
+  let acceptJoin = event => {
+    if (link === '/group')
+      window.location.reload()
+    else
+      notificationService.search(condition).then(value => {
+        setNotification(value.result)
+        return <Link to='/group' />
+      })
+    setLink('/group')
+  }
   let closeUser = event => {
     setOpenUser(false)
   }
+
   let logOut = event => {
     let cookieService = new CookieService()
-    cookieService.delete('token')
-    setOpenUser(false)
+    new UserService().clearCache(userId)
+    cookieService.clearAll()
+    window.location.reload()
   }
   let toggleMessage = () => {
     setOpenMessage(!openMessage)
   }
   let toggleNotify = () => {
+
+    notificationService.search(condition).then(value => {
+      setNotification(value.result)
+    })
     setOpenNotify(!openNotify)
+
   }
   let toggleUser = () => {
     setOpenUser(!openUser)
   }
-  let downClick = () => {
-    setDowAccount(!downAccount)
 
+  if (cookieService.read('token') === '') {
+    access = false
   }
-  if (cookieService.read('token') === '')
+  else {
+    access = true
+  }
+  useEffect(() => {
+    setLink(window.location.pathname)
+    if (cookieService.read('token') === '') setAccess(false)
+    else setAccess(true)
+  }, [access])
+  if (access === false)
     return (
       <div className='content-wrapper' style={{ background: 'white' }}>
-        <AppRoutes access={false} />
+        <AppRoutes access={access} />
       </div>
     )
-  else
+  else {
+
     return (
       <div className={classes.root} style={{ boxShadow: "none" }}>
         <AppBar
@@ -217,9 +467,9 @@ function App() {
                     onClick={toggleMessage}
                   >
                     <FontAwesomeIcon icon={faEnvelope} />
-                    <div className="count bg-success"
+                    {/* <div className="count bg-success"
                       style={{ fontSize: '15px', color: 'white', borderRadius: '50%', width: '24px', height: '24px', marginBottom: '20px' }}
-                    >7</div>
+                    >7</div> */}
                   </Button>
                   <Popper
                     open={openMessage}
@@ -284,15 +534,7 @@ function App() {
                       </Grow>
                     )}
                   </Popper>
-                  <Button
-                    style={{ outlineStyle: 'none', fontSize: '1.1rem' }} ref={anchorRef}
-                    onClick={toggleNotify}
-                  >
-                    <FontAwesomeIcon icon={faBell} />
-                    <div className="count bg-success"
-                      style={{ fontSize: '15px', color: 'white', borderRadius: '50%', width: '24px', height: '24px', marginBottom: '20px' }}
-                    >10</div>
-                  </Button>
+                  <Notification toggleNotify={toggleNotify} userId={userId} access={access} />
                   <Popper
                     open={openNotify}
                     anchorEl={anchorRef.current}
@@ -318,36 +560,11 @@ function App() {
                                 <TextField style={{ fontSize: '15px' }} placeholder="Tìm kiếm"
                                   InputProps={{ disableUnderline: true }} />
                               </MenuItem>
-                              <MenuItem onClick={closeNotify} style={{ width: '24rem' }}>
-                                <img src={require('../assets/images/faces/face4.jpg')}
-                                  style={{ maxHeight: '60px', maxWidth: '60px' }} className="rounded-circle" />
-                                <div className="ml-2">
-                                  <div style={{ fontSize: '15px' }}>Mạnh Hùng</div>
-                                  <div className="text-muted" style={{ fontSize: '12px' }}>
-                                    <span>Hôm qua đi đâu vậy - 1 ngày trước</span>
-                                  </div>
-                                </div>
-                              </MenuItem>
-                              <MenuItem onClick={closeNotify} style={{ width: '24rem' }}>
-                                <img src={require('../assets/images/faces/face3.jpg')}
-                                  style={{ maxHeight: '60px', maxWidth: '60px' }} className="rounded-circle" />
-                                <div className="ml-2">
-                                  <div style={{ fontSize: '15px' }}>Mạnh Hùng</div>
-                                  <div className="text-muted" style={{ fontSize: '12px' }}>
-                                    <span>Hôm qua đi đâu vậy - 1 ngày trước</span>
-                                  </div>
-                                </div>
-                              </MenuItem>
-                              <MenuItem onClick={closeNotify} style={{ width: '24rem' }}>
-                                <img src={require('../assets/images/faces/face2.jpg')}
-                                  style={{ maxHeight: '60px', maxWidth: '60px' }} className="rounded-circle" />
-                                <div className="ml-2">
-                                  <div style={{ fontSize: '15px' }}>Mạnh Hùng</div>
-                                  <div className="text-muted" style={{ fontSize: '12px' }}>
-                                    <span>Hôm qua đi đâu vậy - 1 ngày trước</span>
-                                  </div>
-                                </div>
-                              </MenuItem>
+                              {
+                                notification.map(e => {
+                                  return <NotifyItem data={e} closeNotify={closeNotify} processNotify={processNotify} acceptJoin={acceptJoin} link={link} />
+                                })
+                              }
                             </MenuList>
                           </ClickAwayListener>
                         </Paper>
@@ -358,10 +575,10 @@ function App() {
                     style={{ outlineStyle: 'none', fontSize: '1.1rem' }} ref={anchorRef}
                     onClick={toggleUser}
                   >
-                    <FontAwesomeIcon icon={faBell} />
+                    {/* <img src={avatar} /> */}
                     <div
                       style={{ fontSize: '15px', color: 'black', height: '24px', marginLeft: '20px' }}
-                    >Trần Dũng</div>
+                    >{userName}</div>
                   </Button>
                   <Popper
                     open={openUser}
@@ -386,14 +603,14 @@ function App() {
                               id="menu-list-grow"
                               onKeyDown={handleListKeyDown}
                             >
-                              <MenuItem onClick={closeUser} style={{ width: '15rem' }}>
+                              {/* <MenuItem onClick={closeUser} style={{ width: '15rem' }}>
                                 <img src={require('../assets/images/faces/face4.jpg')}
                                   style={{ maxHeight: '40px', maxWidth: '40px' }} className="rounded-circle" />
                                 <div className="ml-2">
                                   <div style={{ fontSize: '15px', marginLeft: '2rem' }}>Chuyển tài khoản</div>
 
                                 </div>
-                              </MenuItem>
+                              </MenuItem> */}
                               <MenuItem onClick={closeUser} style={{ width: '15rem' }}>
                                 <FontAwesomeIcon style={{ fontSize: '2.5rem' }} icon={faCog} />
                                 <div className="ml-2">
@@ -419,6 +636,7 @@ function App() {
             </div>
           </Toolbar>
         </AppBar>
+
         <Drawer
           variant="permanent"
           className={clsx(classes.drawer, {
@@ -439,78 +657,14 @@ function App() {
               <FontAwesomeIcon icon={faBars} className='mr-2' />
             </button>
           </div>
-          <List>
-            <ListItem button key='text' className={classes.primary} component={Link} to="/dashboard">
-              <ListItemIcon >
-                <FontAwesomeIcon icon={faTv} />
-              </ListItemIcon>
-              <ListItemText primary='Trang chủ' />
-            </ListItem>
-            <ListItem button key='text' className={classes.primary} onClick={downClick}>
-              <ListItemIcon >
-                <FontAwesomeIcon icon={faTruck} className='mr-2' />
-              </ListItemIcon>
-              <ListItemText primary='Vận chuyển' />
-              <ListItemIcon >
-                <UpDownAction open={downAccount} />
-              </ListItemIcon>
-            </ListItem>
-            <Collapse in={downAccount} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested} component={Link} to="/booking/order">
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={faUser} className='mr-2' />
-                  </ListItemIcon>
-                  <ListItemText primary="Đơn hàng" />
-                </ListItem>
-                <ListItem button className={classes.nested} component={Link} to="/booking/order">
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={faRulerVertical} className='mr-2' />
-                  </ListItemIcon>
-                  <ListItemText primary="Chuyến hàng" />
-                </ListItem>
-              </List>
-            </Collapse>
-            <ListItem button key='text' className={classes.primary} onClick={downClick}>
-              <ListItemIcon >
-                <FontAwesomeIcon icon={faIdCard} className='mr-2' />
-              </ListItemIcon>
-              <ListItemText primary='Nhân sự' />
-              <ListItemIcon >
-                <UpDownAction open={downAccount} />
-              </ListItemIcon>
-            </ListItem>
-            <Collapse in={downAccount} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested} component={Link} to="/employee/account">
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={faUser} className='mr-2' />
-                  </ListItemIcon>
-                  <ListItemText primary="Tài khoản" />
-                </ListItem>
-                <ListItem button className={classes.nested} component={Link} to="/employee/role">
-                  <ListItemIcon>
-                    <FontAwesomeIcon icon={faRulerVertical} className='mr-2' />
-                  </ListItemIcon>
-                  <ListItemText primary="Quyền hạn" />
-                </ListItem>
-              </List>
-            </Collapse>
-            <ListItem button key='text' className={classes.primary} component={Link} to="/address">
-              <ListItemIcon >
-                <FontAwesomeIcon icon={faMapMarkerAlt} className='mr-2' />
-              </ListItemIcon>
-              <ListItemText primary='Địa chỉ' />
-            </ListItem>
-          </List>
+          <SideBar role={role} />
         </Drawer>
-        <main className={classes.content}>
-          <div>
-            <AppRoutes access={true} />
-          </div>
-        </main>
+        <div style={{ overflowX: 'hidden', marginTop: '4rem' }}>
+          <AppRoutes access={access} />
+        </div>
       </div>
     )
+  }
 }
 function select(state) {
   return {

@@ -1,4 +1,3 @@
-import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -11,117 +10,119 @@ import Container from '@material-ui/core/Container';
 import UserService from '../../services/UserService';
 import CookieService from '../../services/CookieService';
 import { LinearProgress } from '@material-ui/core';
-import { Redirect } from 'react-router';
-export default class SignIn extends Component {
-  state = {
-    paper: {
-      marginTop: createMuiTheme().spacing(8),
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    avatar: {
-      margin: createMuiTheme().spacing(1),
-      backgroundColor: createMuiTheme().palette.secondary.main,
-    },
-    form: {
-      width: '100%', // Fix IE 11 issue.
-      marginTop: createMuiTheme().spacing(1),
-    },
-    submit: {
-      margin: createMuiTheme().spacing(3, 0, 2),
-    },
-    currentCount: 10,
-    borderBottom: '5px',
-    disabled: false,
-    display: 'none',
-    error: {
-      display: 'none',
-      message: 'Lỗi mạng',
-    }
+import React, { useEffect, useState } from 'react';
+function SignIn() {
+
+
+  let paper = {
+    marginTop: createMuiTheme().spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   }
-  login = (e) => {
-    let username = document.getElementById('username').value
-    let password = document.getElementById('password').value
+  let avatar = {
+    margin: createMuiTheme().spacing(1),
+    backgroundColor: createMuiTheme().palette.secondary.main,
+  }
+  let form = {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: createMuiTheme().spacing(1),
+  }
+  let submit = {
+    margin: createMuiTheme().spacing(3, 0, 2),
+  }
+  let borderBottom = '5px'
+  let [disabled, setDisabled] = useState(false)
+  let [display, setDisplay] = useState('none')
+  let [error, setError] = useState({
+    display: 'none',
+    message: 'Lỗi mạng',
+  })
+  let [username, setUsername] = useState('')
+  let [password, setPassword] = useState('')
+  let login = (e) => {
     let userService = new UserService()
     let cookieService = new CookieService()
-    this.setState({
-      disabled: true,
-      borderBottom: '5px',
-      display: '',
-
-    })
+    borderBottom = '5px'
+    setDisplay('flex')
+    setDisabled(true)
     userService.login(username, password).then(response => {
       cookieService.create('token', response.result.token)
+      cookieService.create('userId', response.result.id)
+      cookieService.create('userName', response.result.name)
+      cookieService.create('role', response.result.roleName)
+      cookieService.create('avatar', response.result.avatar)
       window.location.reload();
     }).catch(error => {
-      this.setState({
-        disabled: false,
-        borderBottom: '5px',
-        display: 'none',
-        error: {
-          display: '',
-          message: error.message
-        }
-      })
+      if (error.response.data.message === 'user.not_found') {
+        setError({
+          display: 'inline',
+          message: 'Tài khoản không đúng',
+        })
+        setDisplay('none')
+        setDisabled(false)
+      }
     })
 
   }
-  render() {
-    return (
+  let changeUserName = e => {
+    setUsername(e.target.value)
+  }
+  let changePassword = e => {
+    setPassword(e.target.value)
+  }
+  return (
+    <div>
       <Container maxWidth="xs">
         <CssBaseline />
-        <div className={this.state.paper}>
+        <div className={paper}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <img src={require('../../../assets/images/icons/logistic_icon.png')}
               style={{ height: '40%', width: '40%' }} />
           </div>
-          <form className={this.state.form} noValidate>
+          <form className={form} noValidate>
             <TextField
-              disabled={this.state.disabled}
+              onChange={changeUserName}
+              disabled={disabled}
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              id="username"
               label="Tên đăng nhập"
-              name="email"
-              autoComplete="email"
               autoFocus
             />
             <TextField
-              disabled={this.state.disabled}
+              onChange={changePassword}
+              disabled={disabled}
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              name="password"
               label="Mật khẩu"
               type="password"
-              id="password"
-              autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" disabled={this.state.disabled} />}
+              control={<Checkbox value="remember" color="primary" disabled={disabled} />}
               label="Giữ đăng nhập"
             />
-            <div style={{ display: `${this.state.error.display}`, color: 'red' }}>{this.state.error.message}</div>
+            <div style={{ display: `${error.display}`, color: 'red' }}>{error.message}</div>
             <Button
-              disabled={this.state.disabled}
+              disabled={disabled}
               style={{
                 borderTopLeftRadius: '5px', borderTopRightRadius: '5px',
-                borderBottomRightRadius: `${this.state.borderBottom}`, borderBottomLeftRadius: `${this.state.borderBottom}`
+                borderBottomRightRadius: `${borderBottom}`, borderBottomLeftRadius: `${borderBottom}`
               }}
               fullWidth
               variant="contained"
               color="primary"
-              className={this.state.submit}
-              onClick={this.login}
+              className={submit}
+              onClick={login}
             >
               Đăng nhập
           </Button>
             <LinearProgress style={{
-              display: `${this.state.display}`, borderBottomRightRadius: '5px',
+              display: `${display}`,
+              borderBottomRightRadius: '5px',
               borderBottomLeftRadius: '5px'
             }} />
             <Grid container>
@@ -139,6 +140,7 @@ export default class SignIn extends Component {
           </form>
         </div>
       </Container >
-    );
-  }
+    </div>
+  )
 }
+export default SignIn

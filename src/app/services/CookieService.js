@@ -26,7 +26,7 @@ export default class CookieService {
         document.cookie = name + '=;';
     }
     erase(cname) {
-        this.createCookie(cname, '', -1);
+        this.create(cname, '', -1);
     }
 
     clearAll() {

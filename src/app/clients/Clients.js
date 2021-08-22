@@ -37,7 +37,9 @@ AxiosClient.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.log(error);
+        let data = error.response.data
+        if (data.status === 600) // loi mat token
+            window.location.reload()
         return Promise.reject(error);
     }
 );

@@ -13,7 +13,7 @@ import {
 import {
     DataTypeProvider, PagingState, IntegratedPaging, TreeDataState, CustomTreeData,
 } from '@devexpress/dx-react-grid';
-import { DialogCreatePermission, DialogEditPermission, AlertCustom } from '../../dialog/DialogPermission'
+import { DialogCreatePermission, DialogEditPermission, AlertResult } from '../../dialog/DialogPermission'
 import { DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
 import { DialogBool } from '../../dialog/DialogBool'
 function Role(props) {
@@ -47,6 +47,13 @@ function Role(props) {
         { columnName: 'roleCode', width: '10rem' },
         { columnName: 'roleName', width: '12rem' },
         { columnName: 'permissionCode', width: '10rem' },
+        { columnName: 'permissionName', width: '12rem' },
+    ]
+    let tableColumnPermission = [
+        { columnName: 'index', width: '4rem' },
+        { columnName: 'action', width: '6rem' },
+        { columnName: 'permissionCode', width: '12rem' },
+        { columnName: 'permissionName', width: '12rem' },
         { columnName: 'permissionName', width: '12rem' },
     ]
     let conditions = []
@@ -677,7 +684,7 @@ function Role(props) {
     return (
         <div className='row'>
             <DialogBool cancel={cancel} confirm={confirm} fail={fail} data={dialogBool} />
-            <AlertCustom data={alertCustom} close={cancel} />
+            <AlertResult data={alertCustom} close={cancel} />
             <Paper className='col-7' >
                 <div style={{ textAlign: 'center', color: `${textColor}` }}>Vai trò</div>
                 <div>
@@ -740,7 +747,7 @@ function Role(props) {
                         for={['action']}
                     />
                     <Table
-                    // columnExtensions={tableColumnExtensions}
+                    columnExtensions={tableColumnPermission}
                     />
                     <TableHeaderRow />
                     <PagingState

@@ -248,7 +248,7 @@ let initState = {
         }],
     selectedAccount: [
         {
-            'field': 'id',
+            'field': 'index',
             'title': 'STT',
             'width': '100px',
             'checked': true
@@ -259,6 +259,13 @@ let initState = {
             'title': 'Thao tác',
             'width': '100px',
             'checked': true
+        },
+        {
+            'field': 'id',
+            'title': 'Mã',
+            'width': '100px',
+            'checked': true
+
         },
         {
             'field': 'name',
@@ -372,7 +379,7 @@ let initState = {
         {
             'field': 'action',
             'title': 'Thao tác',
-            'width': '100px',
+            'width': '200px',
             'checked': true
 
         },
@@ -386,6 +393,99 @@ let initState = {
         {
             'field': 'name',
             'title': 'Tên đơn hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'cod',
+            'title': 'COD',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'pickName',
+            'title': 'Nơi lấy',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'pickLocation',
+            'title': 'Vị trí lấy',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'pickEta',
+            'title': 'Thời gian lấy',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'pickPerson',
+            'title': 'Nhân viên giao',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'dropName',
+            'title': 'Nơi trả',
+            'width': '100px',
+            'checked': true
+
+        },
+
+        {
+            'field': 'dropLocation',
+            'title': 'Vị trí trả',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'dropEta',
+            'title': 'Thời gian trả',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'dropPerson',
+            'title': 'Nhân viên nhận',
+            'width': '100px',
+            'checked': true
+
+        },
+    ],
+    selectedTrip: [
+        {
+            'field': 'index',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'id',
+            'title': 'Mã',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'name',
+            'title': 'Tên chuyến',
             'width': '100px',
             'checked': true
 
@@ -405,46 +505,10 @@ let initState = {
 
         },
         {
-            'field': 'startName',
-            'title': 'Nơi lấy',
+            'field': 'bidStatusName',
+            'title': 'Trạng thái thầu',
             'width': '100px',
             'checked': true
-
-        },
-        {
-            'field': 'startLocation',
-            'title': 'Vị trí lấy',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'startEta',
-            'title': 'Thời gian lấy',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'endName',
-            'title': 'Nơi trả',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'endLocation',
-            'title': 'Vị trí trả',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'endEta',
-            'title': 'Thời gian trả',
-            'width': '100px',
-            'checked': true
-
         },
         {
             'field': 'weight',
@@ -489,8 +553,164 @@ let initState = {
 
         },
         {
-            'field': 'status',
-            'title': 'Trạng thái',
+            'field': 'truckTypeName',
+            'title': 'Loại xe',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'temperatureName',
+            'title': 'Nhiệt độ',
+            'width': '100px',
+            'checked': true
+
+        },
+
+        {
+            'field': 'bidTypeName',
+            'title': 'Loại thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'bidName',
+            'title': 'Nhà thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'bidNameGroup',
+            'title': 'Nhóm thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'note',
+            'title': 'Ghi chú',
+            'width': '100px',
+            'checked': true
+        },
+    ],
+    selectedTripTrucker: [
+        {
+            'field': 'index',
+            'title': 'STT',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'action',
+            'title': 'Thao tác báo giá',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'customerName',
+            'title': 'Khách hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'name',
+            'title': 'Tên chuyến',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'openBid',
+            'title': 'Mở thầu',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'closeBid',
+            'title': 'Đóng thầu',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'bidStatusName',
+            'title': 'Trạng thái thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'weight',
+            'title': 'Tổng khối lượng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'volumeRequire',
+            'title': 'Thể tích xe',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'weightRequire',
+            'title': 'Tải trọng xe',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'isCombine',
+            'title': 'Ghép chuyến',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'isReturn',
+            'title': 'Trở về',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'maxFee',
+            'title': 'Cước trần',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
+            'field': 'truckTypeName',
+            'title': 'Loại xe',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'temperatureName',
+            'title': 'Nhiệt độ',
+            'width': '100px',
+            'checked': true
+
+        },
+
+        {
+            'field': 'bidTypeName',
+            'title': 'Loại thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'bidNameGroup',
+            'title': 'Nhóm thầu',
+            'width': '100px',
+            'checked': true
+        },
+        {
+            'field': 'note',
+            'title': 'Ghi chú',
             'width': '100px',
             'checked': true
         },
@@ -725,15 +945,14 @@ function reducer(state = initState, action) {
             else
                 state['disabledDetail'] = false
             return state
-        case 'CHANGE_CHECKED_ACCOUNT':
-            state['checkedDetail'] = action.value
-            if (action.value === 9)
-                state['disabledDetail'] = true
-            else
-                state['disabledDetail'] = false
+        case 'CHANGE_SELECTED_ACCOUNT':
+            state['selectedAccount'] = action.value
             return state
         case 'CHANGE_SELECTED_ADDRESS':
             state['selectedAddress'] = action.value
+            return state
+        case 'CHANGE_SELECTED_TRIP':
+            state['selectedTrip'] = action.value
             return state
         case 'CHANGE_SELECTED_ORDER':
             state['selectedOrder'] = action.value

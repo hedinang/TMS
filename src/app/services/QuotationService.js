@@ -1,8 +1,8 @@
 import AxiosClient from '../clients/Clients'
 import CookieService from '../services/CookieService';
-export default class AddressService {
+export default class QuotationService {
     search(condition) {
-        return AxiosClient.post('/address/search', condition, {
+        return AxiosClient.post('/quotation/search', condition, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -16,7 +16,7 @@ export default class AddressService {
             })
     }
     searchNot(id, condition) {
-        return AxiosClient.post('/address/searchNot/' + id, condition, {
+        return AxiosClient.post('/quotation/searchNot/' + id, condition, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -30,7 +30,7 @@ export default class AddressService {
             })
     }
     findById(id) {
-        return AxiosClient.get('/address/' + id, {
+        return AxiosClient.get('/quotation/' + id, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -44,7 +44,7 @@ export default class AddressService {
             })
     }
     find(condition) {
-        return AxiosClient.post('/address/find', condition, {
+        return AxiosClient.post('/quotation/find', condition, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -57,8 +57,8 @@ export default class AddressService {
                 return Promise.reject(error);
             })
     }
-    create(addressRequest) {
-        return AxiosClient.post('/address', addressRequest, {
+    create(quotationRequest) {
+        return AxiosClient.post('/quotation', quotationRequest, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -71,8 +71,8 @@ export default class AddressService {
                 return Promise.reject(error);
             })
     }
-    update(id, addressRequest) {
-        return AxiosClient.put('/address/' + id, addressRequest, {
+    update(id, quotationRequest) {
+        return AxiosClient.put('/quotation/' + id, quotationRequest, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -86,7 +86,7 @@ export default class AddressService {
             })
     }
     delete(id) {
-        return AxiosClient.delete('/address/' + id, {
+        return AxiosClient.delete('/quotation/' + id, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }
@@ -100,7 +100,7 @@ export default class AddressService {
             })
     }
     removePermission(request) {
-        return AxiosClient.post('/address/remove', request, {
+        return AxiosClient.post('/quotation/remove', request, {
             headers: {
                 Authorization: 'Bearer ' + new CookieService().read('token')
             }

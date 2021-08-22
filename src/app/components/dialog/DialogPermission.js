@@ -235,7 +235,7 @@ function DeletePermission(event) {
         </Dialog>
     )
 }
-function AlertCustom(event) {
+function AlertResult(event) {
     let close = () => {
         event.close('CLOSE_ALERT')
     }
@@ -250,4 +250,4 @@ function AlertCustom(event) {
         </Alert>
     </Snackbar>)
 }
-export { DialogCreatePermission, DialogEditPermission, DeletePermission, AlertCustom }
+export { DialogCreatePermission, DialogEditPermission, DeletePermission, AlertResult }

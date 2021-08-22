@@ -58,16 +58,6 @@ class Dashboard extends Component {
     slidesToShow: 1,
     slidesToScroll: 1
   }
-  toggleProBanner() {
-    document.querySelector('.proBanner').classList.toggle("hide");
-  }
-  // var sse = new EventSource('http://localhost:8090/tms/trip-monitor/sse');
-  // sse.onmessage = function (evt) {
-  //   console.log('aaa')
-  // var el = document.getElementById('sse');
-  // el.appendChild(document.createTextNode(evt.data));
-  // el.appendChild(document.createElement('br'));
-  // };
   componentDidMount() {
     this.getData();
   }
