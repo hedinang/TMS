@@ -8,9 +8,8 @@ const TruckGroup = lazy(() => import('./components/pages/TruckGroup'));
 const Trip = lazy(() => import('./components/pages/Trip'));
 const Quotation = lazy(() => import('./components/pages/Quotation'));
 const Group = lazy(() => import('./components/pages/Group'));
-const Device = lazy(() => import('./components/pages/method/Device'));
-const Account = lazy(() => import('./components/pages/employee/Account'));
-const Role = lazy(() => import('./components/pages/employee/Role'));
+const Account = lazy(() => import('./components/pages/Account'));
+const Role = lazy(() => import('./components/pages/Role'));
 const Login = lazy(() => import('./components/user-pages/Login'));
 // cham co the la do mat mang load boostrap lau
 
@@ -35,7 +34,6 @@ function AppRoutes(props) {
         <PrivateRoute access={props.access} path='/group' component={Group} />
         <PrivateRoute access={props.access} path='/trip' component={Trip} />
         <PrivateRoute access={props.access} path='/quotation' component={Quotation} />
-        <PrivateRoute access={props.access} path='/device' component={Device} />
         <PrivateRoute access={props.access} path='/account' component={Account} />
         <PrivateRoute access={props.access} path='/role' component={Role} />
         {/* <Route path="/dashboard" component={Dashboard} /> */}

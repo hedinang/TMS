@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
-import TableAccount from '../../tables/TableAccount'
+import TableAccount from '../tables/TableAccount'
 import { faPlusSquare, faAllergies, faEye } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GridList, GridListTile, Checkbox } from '@material-ui/core'
-import { action } from '../../../redux/actions/actions'
-import { DialogCreateAccount, AlertResult } from '../../dialog/DialogAccount';
+import { action } from '../../redux/actions/actions'
+import { DialogCreateAccount, AlertResult } from '../dialog/DialogAccount';
 function Account(props) {
   let [selected, setSelected] = useState([])
   let [checked, setChecked] = useState(0)

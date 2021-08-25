@@ -72,7 +72,7 @@ function TemperatureTable(props) {
         )
     else return <div></div>
 }
-function PickTable(props) {
+function GoodTable(props) {
     let [selectedGood, setSelectedGood] = useState([])
     let [good, setGood] = useState([])
     let tableColumnExtensions = [
@@ -104,94 +104,7 @@ function PickTable(props) {
             setTitle('Hàng nhận trong đơn ' + props.data.name)
             orderService.findById(props.data.orderId)
                 .then(value => {
-                    good = value.result.pickGood.map(e => {
-                        return {
-                            name: e.name,
-                            weight: e.weight,
-                            package: e.pack
-                        }
-                    })
-                })
-                .catch(error => {
-                    console.log('aaa');
-                }).finally(() => {
-                    setGood(good)
-                })
-        }
-    }, [props.data])
-    let StatusFormatter = (value) => {
-        switch (value.column.name) {
-
-            default:
-                return <div style={{ whiteSpace: 'pre-wrap' }}>{value.value}</div>
-        }
-    }
-    let StatusTypeProvider = props => (
-        <DataTypeProvider
-            formatterComponent={StatusFormatter}
-            {...props}
-        />
-    )
-    if (props.value === props.index)
-        return (
-            <div className='row'>
-                <div className='col-12' style={{ textAlign: 'center' }}>{title}</div>
-                <Paper className='col-12' style={{ borderLeft: 'solid 1px', borderColor: '#c1c1c1' }}>
-                    <Grid
-                        rows={good}
-                        columns={selectedGood}
-                    >
-                        < StatusTypeProvider
-                            for={['name']}
-                        />
-                        <FilteringState columnExtensions={filteringStateColumnExtensions} />
-                        <IntegratedFiltering />
-                        <Table
-                            columnExtensions={tableColumnExtensions}
-                        />
-                        <TableHeaderRow />
-                        <TableFilterRow />
-                    </Grid>
-                </Paper>
-
-            </div>
-        )
-    else return <div></div>
-
-}
-function DropTable(props) {
-    let [selectedGood, setSelectedGood] = useState([])
-    let [good, setGood] = useState([])
-    let tableColumnExtensions = [
-        { columnName: 'name', width: '8rem' },
-        { columnName: 'weight', width: '8rem' },
-        { columnName: 'down', width: '10rem' },
-        { columnName: 'up', width: '8rem' }]
-    let [title, setTitle] = useState('')
-    let filteringStateColumnExtensions = [
-        { columnName: 'index', filteringEnabled: false },
-        { columnName: 'action', filteringEnabled: false },
-    ]
-    useEffect(() => {
-        selectedGood = [
-            {
-                'name': 'name',
-                'title': 'Tên',
-            },
-            {
-                'name': 'weight',
-                'title': 'Khối lượng(kg)',
-            },
-            {
-                'name': 'package',
-                'title': 'Số gói hàng',
-            }]
-        setSelectedGood(selectedGood)
-        if (props.data.orderId !== 0) {
-            setTitle('Hàng trả trong đơn ' + props.data.name)
-            orderService.findById(props.data.orderId)
-                .then(value => {
-                    good = value.result.dropGood.map(e => {
+                    good = value.result.good.map(e => {
                         return {
                             name: e.name,
                             weight: e.weight,
@@ -375,15 +288,11 @@ function OrderTable(props) {
                             index: i,
                             id: e.id,
                             name: e.name,
+                            type: e.type,
                             cod: e.cod,
-                            pickName: e.pickName,
-                            pickPerson: e.pickPerson,
-                            pickLocation: e.pickLocation,
-                            pickEta: e.pickEta,
-                            dropName: e.dropName,
-                            dropPerson: e.dropPerson,
-                            dropLocation: e.dropLocation,
-                            dropEta: e.dropEta,
+                            person: e.person,
+                            location: e.location,
+                            eta: e.eta,
                         }
                     })
                 })
@@ -526,6 +435,22 @@ function OrderTable(props) {
                         }}>Không</span>
                 }
                 break;
+            case 'type':
+                switch (value.value) {
+                    case 0:
+                        return <span style={{
+                            padding: '.5em .75em',
+                            textAlign: 'center', background: '#0abb88',
+                            borderRadius: '0.25rem', color: 'white',
+                        }}>Đơn nhận</span>
+                    case 1:
+                        return <span style={{
+                            padding: '.5em .75em',
+                            textAlign: 'center', background: '#ffab02',
+                            borderRadius: '0.25rem', color: 'white',
+                        }}>Đơn trả</span>
+                }
+                break;
             default:
                 return <div style={{ whiteSpace: 'pre-wrap' }}>{value.value}</div>
         }
@@ -569,14 +494,13 @@ function OrderTable(props) {
                         columns={selectedOrder}
                     >
                         < StatusTypeProvider
-                            for={['cod', 'pickName', 'pickLocation',
-                                'pickPerson', 'dropName', 'dropLocation', 'dropPerson']}
+                            for={['cod', 'type']}
                         />
                         < ActionTypeProvider
                             for={['action']}
                         />
 
-                        <TimeTypeProvider for={['pickEta', 'dropEta']}
+                        <TimeTypeProvider for={['eta']}
                         />
                         <FilteringState columnExtensions={filteringStateColumnExtensions} />
                         <IntegratedFiltering />
@@ -916,14 +840,12 @@ function select(state) {
 let TableTrip = connect(select)(TripTable)
 let TableOrder = connect(select)(OrderTable)
 let TableQuotation = connect(select)(QuotationTable)
-let TablePick = connect(select)(PickTable)
-let TableDrop = connect(select)(DropTable)
+let TableGood = connect(select)(GoodTable)
 let TableTemperature = connect(select)(TemperatureTable)
 export {
     TableOrder,
     TableQuotation,
-    TablePick,
-    TableDrop,
+    TableGood,
     TableTemperature,
     TableTrip
 }

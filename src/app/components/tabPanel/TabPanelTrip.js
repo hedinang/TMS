@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
-import { faMoneyBillAlt, faBoxOpen, faTruck, faDolly, faWarehouse } from '@fortawesome/fontawesome-free-solid'
+import { faMoneyBillAlt, faBoxOpen, faTruck } from '@fortawesome/fontawesome-free-solid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     AppBar, Tab, Tabs
 } from '@material-ui/core';
 
 import Condition from '../../models/Condition';
-import { TableOrder, TableQuotation, TableDrop, TablePick, TableTemperature, TableTrip } from '../tables/TableTrip';
+import { TableOrder, TableQuotation, TableGood, TableTrip } from '../tables/TableTrip';
 let pages = [1, 10, "id", 0]
 let conditions = []
 
@@ -54,14 +54,6 @@ function TabPanelTrip(props) {
                 break;
         }
     }
-    let changeTabRight = (event, newValue) => {
-        setCol({
-            left: col.left,
-            right: col.right,
-            tabLeft: col.tabLeft,
-            tabRight: newValue
-        })
-    }
     let clickTripView = (tripId, name) => {
         setDataOrder({ tripId: tripId, name: name })
         changeTabLeft('none', 1)
@@ -100,28 +92,10 @@ function TabPanelTrip(props) {
                 <TableOrder value={col.tabLeft} index={1} view={clickOrderView} reload={props.reload} data={dataOrder} />
                 <TableQuotation value={col.tabLeft} index={2} reload={props.reload} />
             </div>
-            <div className='col-3' style={{ display: `${col.right}` }}>
-                <AppBar position="static" style={{
-                    background: 'white', color: 'black',
-                    borderStyle: 'none', boxShadow: 'none',
-                }}>
-                    <Tabs
-                        style={{ background: 'white' }}
-                        value={col.tabRight}
-                        onChange={changeTabRight} >
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
-                            <FontAwesomeIcon icon={faDolly} className='mr-2' />
-                            <span>Hàng trả </span>
-                        </div>} />
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
-                            <FontAwesomeIcon icon={faWarehouse} className='mr-2' />
-                            <span>Hàng nhận </span>
-                        </div>} />
-                    </Tabs>
-                </AppBar>
-                <TableDrop value={col.tabRight} index={0} data={dataGood} />
-                <TablePick value={col.tabRight} index={1} data={dataGood} />
-
+            <div className='col-3' style={{ display: `${col.right}`, textAlign: 'center' }}>
+                <div>Chi tiết đơn hàng</div>
+                <div>Rau củ quả</div>
+                <TableGood value={col.tabRight} data={dataGood} />
             </div>
         </div>
     )

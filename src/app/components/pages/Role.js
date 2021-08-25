@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
-import PermissionService from '../../../services/PermissionService'
-import RoleService from '../../../services/RoleService'
-import Condition from '../../../models/Condition'
+import PermissionService from '../../services/PermissionService'
+import RoleService from '../../services/RoleService'
+import Condition from '../../models/Condition'
 import { connect } from 'react-redux'
 import { Button, Paper } from '@material-ui/core';
 import { faPencilAlt, faTrashAlt, faPlusSquare } from '@fortawesome/fontawesome-free-solid'
@@ -13,9 +13,9 @@ import {
 import {
     DataTypeProvider, PagingState, IntegratedPaging, TreeDataState, CustomTreeData,
 } from '@devexpress/dx-react-grid';
-import { DialogCreatePermission, DialogEditPermission, AlertResult } from '../../dialog/DialogPermission'
-import { DialogCreateRole, DialogEditRole } from '../../dialog/DialogRole'
-import { DialogBool } from '../../dialog/DialogBool'
+import { DialogCreatePermission, DialogEditPermission, AlertResult } from '../dialog/DialogPermission'
+import { DialogCreateRole, DialogEditRole } from '../dialog/DialogRole'
+import { DialogBool } from '../dialog/DialogBool'
 function Role(props) {
     let permissionService = new PermissionService()
     let roleService = new RoleService()

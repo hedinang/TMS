@@ -398,6 +398,13 @@ let initState = {
 
         },
         {
+            'field': 'type',
+            'title': 'Loại đơn hàng',
+            'width': '100px',
+            'checked': true
+
+        },
+        {
             'field': 'cod',
             'title': 'COD',
             'width': '100px',
@@ -405,57 +412,21 @@ let initState = {
 
         },
         {
-            'field': 'pickName',
-            'title': 'Nơi lấy',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'pickLocation',
+            'field': 'location',
             'title': 'Vị trí lấy',
             'width': '100px',
             'checked': true
 
         },
         {
-            'field': 'pickEta',
+            'field': 'eta',
             'title': 'Thời gian lấy',
             'width': '100px',
             'checked': true
         },
         {
-            'field': 'pickPerson',
-            'title': 'Nhân viên giao',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'dropName',
-            'title': 'Nơi trả',
-            'width': '100px',
-            'checked': true
-
-        },
-
-        {
-            'field': 'dropLocation',
-            'title': 'Vị trí trả',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'dropEta',
-            'title': 'Thời gian trả',
-            'width': '100px',
-            'checked': true
-
-        },
-        {
-            'field': 'dropPerson',
-            'title': 'Nhân viên nhận',
+            'field': 'person',
+            'title': 'Người giao nhận',
             'width': '100px',
             'checked': true
 

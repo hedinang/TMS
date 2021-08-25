@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 
 import Condition from '../../models/Condition';
-import { TableOrder, TableQuotation, TableDrop, TablePick, TableTrip } from '../tables/TableQuotation';
+import { TableOrder, TableQuotation, TableGood, TableTrip } from '../tables/TableQuotation';
 let pages = [1, 10, "id", 0]
 let conditions = []
 
@@ -104,28 +104,10 @@ function TabPanelQuotation(props) {
                 <div style={{ textAlign: 'center' }}>BÁO GIÁ</div>
                 <TableQuotation value={col.tabRight} index={0} data={dataQuotation} />
             </div>
-            <div className='col-3' style={{ display: `${col.right}` }}>
-                <AppBar position="static" style={{
-                    background: 'white', color: 'black',
-                    borderStyle: 'none', boxShadow: 'none',
-                }}>
-                    <Tabs
-                        style={{ background: 'white' }}
-                        value={col.tabRight}
-                        onChange={changeTabRight} >
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
-                            <FontAwesomeIcon icon={faDolly} className='mr-2' />
-                            <span>Hàng trả </span>
-                        </div>} />
-                        <Tab style={{ opacity: 1, outlineStyle: 'none' }} label={<div>
-                            <FontAwesomeIcon icon={faWarehouse} className='mr-2' />
-                            <span>Hàng nhận </span>
-                        </div>} />
-                    </Tabs>
-                </AppBar>
-                <TableDrop value={col.tabRight} index={0} data={dataGood} />
-                <TablePick value={col.tabRight} index={1} data={dataGood} />
-
+            <div className='col-3' style={{ display: `${col.right}`, textAlign: 'center'  }}>
+                <div>Chi tiết đơn hàng</div>
+                <div>Rau củ quả</div>
+                <TableGood value={col.tabRight} index={0} data={dataGood} />
             </div>
         </div>
     )
